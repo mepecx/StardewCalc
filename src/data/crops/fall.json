@@ -14,7 +14,7 @@
     "giantCropChance": 0.01,
     "processing": {
       "preservesJar": { "output": "Pumpkin Pickle", "sellPrice": 690, "processDays": 2.8, "processor": "preservesJar" },
-      "keg": { "output": "Pumpkin Juice", "sellPrice": 480, "processDays": 4, "processor": "keg" }
+      "keg": { "output": "Pumpkin Juice", "sellPrice": 720, "processDays": 4, "processor": "keg" }
     }
   },
   {
@@ -31,7 +31,7 @@
     "category": "vegetable",
     "processing": {
       "preservesJar": { "output": "Yam Pickle", "sellPrice": 370, "processDays": 2.8, "processor": "preservesJar" },
-      "keg": { "output": "Yam Juice", "sellPrice": 240, "processDays": 4, "processor": "keg" }
+      "keg": { "output": "Yam Juice", "sellPrice": 360, "processDays": 4, "processor": "keg" }
     }
   },
   {
@@ -47,7 +47,8 @@
     "sellPrice": 80,
     "category": "vegetable",
     "processing": {
-      "preservesJar": { "output": "Bok Choy Pickle", "sellPrice": 210, "processDays": 2.8, "processor": "preservesJar" }
+      "preservesJar": { "output": "Bok Choy Pickle", "sellPrice": 210, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Bok Choy Juice", "sellPrice": 180, "processDays": 4, "processor": "keg" }
     }
   },
   {
@@ -64,7 +65,7 @@
     "category": "vegetable",
     "processing": {
       "preservesJar": { "output": "Amaranth Pickle", "sellPrice": 350, "processDays": 2.8, "processor": "preservesJar" },
-      "keg": { "output": "Amaranth Juice", "sellPrice": 225, "processDays": 4, "processor": "keg" }
+      "keg": { "output": "Amaranth Juice", "sellPrice": 337, "processDays": 4, "processor": "keg" }
     }
   },
   {
@@ -115,7 +116,7 @@
     "category": "vegetable",
     "processing": {
       "preservesJar": { "output": "Artichoke Pickle", "sellPrice": 370, "processDays": 2.8, "processor": "preservesJar" },
-      "keg": { "output": "Artichoke Juice", "sellPrice": 240, "processDays": 4, "processor": "keg" }
+      "keg": { "output": "Artichoke Juice", "sellPrice": 360, "processDays": 4, "processor": "keg" }
     }
   },
   {
@@ -131,7 +132,8 @@
     "sellPrice": 60,
     "category": "vegetable",
     "processing": {
-      "preservesJar": { "output": "Eggplant Pickle", "sellPrice": 170, "processDays": 2.8, "processor": "preservesJar" }
+      "preservesJar": { "output": "Eggplant Pickle", "sellPrice": 170, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Eggplant Juice", "sellPrice": 135, "processDays": 4, "processor": "keg" }
     }
   },
   {
@@ -147,7 +149,8 @@
     "sellPrice": 100,
     "category": "vegetable",
     "processing": {
-      "preservesJar": { "output": "Beet Pickle", "sellPrice": 250, "processDays": 2.8, "processor": "preservesJar" }
+      "preservesJar": { "output": "Beet Pickle", "sellPrice": 250, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Beet Juice", "sellPrice": 225, "processDays": 4, "processor": "keg" }
     }
   },
   {

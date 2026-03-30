@@ -30,11 +30,24 @@ export function effectiveSellPrice(
 }
 
 /**
- * Returns processing time in days for the selected sell mode, 0 for raw.
+ * Returns processing time in whole days for the selected sell mode, 0 for raw.
+ * Always rounds UP to the nearest integer (a 2.8-day process takes 3 full days).
  */
 export function getProcessDays(crop: Crop, sellMode: SellMode): number {
   if (sellMode === 'raw') return 0
-  return crop.processing[sellMode]?.processDays ?? 0
+  const raw = crop.processing[sellMode]?.processDays ?? 0
+  return raw > 0 ? Math.ceil(raw) : 0
+}
+
+/**
+ * Returns effective grow days after applying fertilizer speed reduction.
+ * Only affects initial growDays — regrowDays are never reduced by fertilizer.
+ */
+export function effectiveGrowDays(crop: Crop, settings: UserSettings): number {
+  const mult = settings.fertilizer === 'speedGro' ? 0.9
+    : settings.fertilizer === 'deluxeSpeedGro' ? 0.75
+    : 1.0
+  return Math.max(1, Math.floor(crop.growDays * mult))
 }
 
 /**

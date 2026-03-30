@@ -52,13 +52,16 @@ export function processingCalc(crop: Crop, settings: UserSettings): ProcessingRe
   variants.sort((a, b) => b.profitPerDay - a.profitPerDay)
   const best = variants[0]
 
+  // Pull harvest info from the raw full-season result for display purposes
+  const rawResult = fullSeasonCalc(crop, settings, 'raw')
+
   return {
     cropId: crop.id,
     sellMode: best.sellMode,
     totalProfit: best.totalProfit,
     profitPerDay: best.profitPerDay,
-    totalHarvests: 0,   // not meaningful for the comparison view
-    totalYield: 0,
+    totalHarvests: rawResult?.totalHarvests ?? 0,
+    totalYield: rawResult?.totalYield ?? 0,
     variants,
     bestSellMode: best.sellMode,
   }

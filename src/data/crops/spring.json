@@ -28,7 +28,7 @@
     "sellPrice": 80,
     "category": "vegetable",
     "processing": {
-      "preservesJar": { "output": "Potato Pickle", "sellPrice": 220, "processDays": 2.8, "processor": "preservesJar" }
+      "preservesJar": { "output": "Potato Pickle", "sellPrice": 210, "processDays": 2.8, "processor": "preservesJar" }
     }
   },
   {
@@ -46,7 +46,7 @@
     "giantCropChance": 0.01,
     "processing": {
       "preservesJar": { "output": "Cauliflower Pickle", "sellPrice": 400, "processDays": 2.8, "processor": "preservesJar" },
-      "keg": { "output": "Vegetable Juice", "sellPrice": 262, "processDays": 4, "processor": "keg" }
+      "keg": { "output": "Vegetable Juice", "sellPrice": 393, "processDays": 4, "processor": "keg" }
     }
   },
   {
@@ -62,7 +62,8 @@
     "sellPrice": 40,
     "category": "vegetable",
     "processing": {
-      "preservesJar": { "output": "Green Bean Pickle", "sellPrice": 130, "processDays": 2.8, "processor": "preservesJar" }
+      "preservesJar": { "output": "Green Bean Pickle", "sellPrice": 130, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Vegetable Juice", "sellPrice": 90, "processDays": 4, "processor": "keg" }
     }
   },
   {
@@ -79,7 +80,7 @@
     "category": "vegetable",
     "processing": {
       "preservesJar": { "output": "Kale Pickle", "sellPrice": 270, "processDays": 2.8, "processor": "preservesJar" },
-      "keg": { "output": "Vegetable Juice", "sellPrice": 165, "processDays": 4, "processor": "keg" }
+      "keg": { "output": "Vegetable Juice", "sellPrice": 247, "processDays": 4, "processor": "keg" }
     }
   },
   {

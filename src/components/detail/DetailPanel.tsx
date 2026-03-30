@@ -1,63 +1,54 @@
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { useSettingsContext } from '../../context/SettingsContext'
-import { getCropsForSeason } from '../../data'
-import { runCalc } from '../../calc'
-import { SimpleDetail } from './SimpleDetail'
-import { FullSeasonDetail } from './FullSeasonDetail'
-import { CompoundingDetail } from './CompoundingDetail'
-import { ProcessingDetail } from './ProcessingDetail'
-import type { SimpleResult, FullSeasonResult, CompoundingResult, ProcessingResult } from '../../types'
-import { useMemo } from 'react'
+import { DetailContent } from './DetailContent'
+
+const MIN_WIDTH = 288   // 18rem (w-72)
+const MAX_WIDTH = 640   // 40rem
+const DEFAULT_WIDTH = 288
 
 export function DetailPanel() {
-  const { settings, selectedCropId, setSelectedCropId } = useSettingsContext()
+  const { setSelectedCropId } = useSettingsContext()
+  const [width, setWidth] = useState(DEFAULT_WIDTH)
+  const isDragging = useRef(false)
+  const startX = useRef(0)
+  const startWidth = useRef(DEFAULT_WIDTH)
 
-  const selectedCrop = useMemo(() => {
-    if (!selectedCropId) return null
-    return getCropsForSeason(settings.season).find(c => c.id === selectedCropId) ?? null
-  }, [selectedCropId, settings.season])
+  const onMouseDown = useCallback((e: React.MouseEvent) => {
+    isDragging.current = true
+    startX.current = e.clientX
+    startWidth.current = width
+    e.preventDefault()
+  }, [width])
 
-  const result = useMemo(() => {
-    if (!selectedCrop) return null
-    return runCalc(selectedCrop, settings)
-  }, [selectedCrop, settings])
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return
+      // Dragging left = panel gets wider (panel is on right side)
+      const delta = startX.current - e.clientX
+      setWidth(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startWidth.current + delta)))
+    }
+    const onMouseUp = () => { isDragging.current = false }
 
-  if (!selectedCrop || !result) {
-    return (
-      <aside className="hidden lg:flex flex-col w-72 shrink-0 bg-white border-l border-gray-200 p-4">
-        <p className="text-sm text-gray-400 text-center mt-8">
-          Click a crop to see details
-        </p>
-      </aside>
-    )
-  }
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
+    }
+  }, [])
 
   return (
-    <aside className="lg:flex flex-col w-72 shrink-0 bg-white border-l border-gray-200 overflow-y-auto">
-      <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between z-10">
-        <h2 className="font-semibold text-gray-900 text-sm">{selectedCrop.name}</h2>
-        <button
-          onClick={() => setSelectedCropId(null)}
-          className="text-gray-400 hover:text-gray-600 text-lg leading-none focus:outline-none"
-          aria-label="Close detail panel"
-        >
-          ×
-        </button>
-      </div>
-
-      <div className="p-4">
-        {settings.mode === 'simple' && (
-          <SimpleDetail crop={selectedCrop} result={result as SimpleResult} />
-        )}
-        {settings.mode === 'fullSeason' && (
-          <FullSeasonDetail crop={selectedCrop} result={result as FullSeasonResult} />
-        )}
-        {settings.mode === 'compounding' && (
-          <CompoundingDetail crop={selectedCrop} result={result as CompoundingResult} />
-        )}
-        {settings.mode === 'processing' && (
-          <ProcessingDetail crop={selectedCrop} result={result as ProcessingResult} />
-        )}
-      </div>
+    <aside
+      className="hidden lg:flex flex-col shrink-0 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 overflow-y-auto relative"
+      style={{ width }}
+    >
+      {/* Resize handle */}
+      <div
+        onMouseDown={onMouseDown}
+        className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-blue-400/40 dark:hover:bg-blue-500/40 active:bg-blue-400/60 dark:active:bg-blue-500/60 z-20 transition-colors"
+        title="Drag to resize"
+      />
+      <DetailContent onClose={() => setSelectedCropId(null)} />
     </aside>
   )
 }

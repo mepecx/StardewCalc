@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import type { CropWithResult } from './useCalcResults'
+import type { CompoundingResult } from '../types'
 
-export type SortKey = 'name' | 'seedCost' | 'profitPerDay' | 'totalProfit' | 'totalHarvests'
+export type SortKey = 'name' | 'seedCost' | 'profitPerDay' | 'totalProfit' | 'totalHarvests' | 'peakSeeds'
 export type SortDir = 'asc' | 'desc'
 
 export function useSort(items: CropWithResult[]) {
@@ -42,6 +43,10 @@ export function useSort(items: CropWithResult[]) {
         case 'totalHarvests':
           valA = a.result?.totalHarvests ?? 0
           valB = b.result?.totalHarvests ?? 0
+          break
+        case 'peakSeeds':
+          valA = (a.result as CompoundingResult | undefined)?.peakSeeds ?? 0
+          valB = (b.result as CompoundingResult | undefined)?.peakSeeds ?? 0
           break
       }
 

@@ -39,6 +39,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       }
       return next
     })
+    // Clear crop selection when season changes (selected crop may not exist in new season)
+    if (patch.season !== undefined) {
+      setSelectedCropId(null)
+    }
   }, [])
 
   return (

@@ -1,4 +1,4 @@
-import type { Crop, AnyResult, ProcessingResult } from '../../types'
+import type { Crop, AnyResult, ProcessingResult, CompoundingResult } from '../../types'
 import { CategoryBadge, SeedSourceBadge } from '../ui/Badge'
 import { GoldIcon, formatGold } from '../ui/GoldIcon'
 import { Tooltip } from '../ui/Tooltip'
@@ -17,23 +17,23 @@ export function CropRow({ crop, result, isSelected, onClick, mode }: Props) {
   return (
     <tr
       onClick={onClick}
-      className={`border-b border-gray-100 cursor-pointer transition-colors ${
+      className={`border-b border-gray-100 dark:border-gray-700 cursor-pointer transition-colors ${
         isSelected
-          ? 'bg-green-50 hover:bg-green-100'
-          : 'hover:bg-gray-50'
+          ? 'bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30'
+          : 'hover:bg-gray-50 dark:hover:bg-gray-800'
       }`}
     >
       {/* Crop name + category */}
       <td className="px-3 py-2.5">
         <div className="flex items-center gap-2">
           <CategoryBadge category={crop.category} />
-          <span className="text-sm font-medium text-gray-900">{crop.name}</span>
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{crop.name}</span>
         </div>
       </td>
 
       {/* Seed cost */}
       <td className="px-3 py-2.5 text-right">
-        <span className="inline-flex items-center justify-end gap-1 text-sm text-gray-700">
+        <span className="inline-flex items-center justify-end gap-1 text-sm text-gray-700 dark:text-gray-300">
           <GoldIcon className="w-3.5 h-3.5" />
           {formatGold(crop.seedCost)}
         </span>
@@ -57,7 +57,7 @@ export function CropRow({ crop, result, isSelected, onClick, mode }: Props) {
         {isNA ? (
           <span className="text-sm text-gray-400">—</span>
         ) : (
-          <span className="inline-flex items-center justify-end gap-1 text-sm font-semibold text-gray-900">
+          <span className="inline-flex items-center justify-end gap-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
             <GoldIcon className="w-3.5 h-3.5" />
             {formatGold(result!.profitPerDay)}/day
           </span>
@@ -65,9 +65,16 @@ export function CropRow({ crop, result, isSelected, onClick, mode }: Props) {
       </td>
 
       {/* Harvests */}
-      <td className="px-3 py-2.5 text-right text-sm text-gray-600">
+      <td className="px-3 py-2.5 text-right text-sm text-gray-600 dark:text-gray-400">
         {isNA || mode === 'processing' ? '—' : result!.totalHarvests || '—'}
       </td>
+
+      {/* Peak Seeds (compounding only) */}
+      {mode === 'compounding' && (
+        <td className="px-3 py-2.5 text-right text-sm text-gray-600 dark:text-gray-400">
+          {isNA ? '—' : (result as CompoundingResult).peakSeeds ?? '—'}
+        </td>
+      )}
 
       {/* Seed sources */}
       <td className="px-3 py-2.5">
@@ -82,7 +89,7 @@ export function CropRow({ crop, result, isSelected, onClick, mode }: Props) {
 }
 
 function ProfitCell({ value }: { value: number }) {
-  const color = value >= 0 ? 'text-green-700' : 'text-red-600'
+  const color = value >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-600 dark:text-red-400'
   return (
     <span className={`inline-flex items-center justify-end gap-1 text-sm font-medium ${color}`}>
       <GoldIcon className="w-3.5 h-3.5" />
@@ -96,7 +103,7 @@ function ProcessingBestCell({ result }: { result: ProcessingResult }) {
   if (!best) return <span className="text-sm text-gray-400">—</span>
   return (
     <Tooltip text={`Best: ${best.outputName}`}>
-      <span className="inline-flex items-center justify-end gap-1 text-sm font-medium text-green-700">
+      <span className="inline-flex items-center justify-end gap-1 text-sm font-medium text-green-700 dark:text-green-400">
         <GoldIcon className="w-3.5 h-3.5" />
         {formatGold(best.totalProfit)}
       </span>
