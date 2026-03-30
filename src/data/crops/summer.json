@@ -14,7 +14,7 @@
     "giantCropChance": 0.01,
     "processing": {
       "preservesJar": { "output": "Melon Jelly", "sellPrice": 550, "processDays": 2.8, "processor": "preservesJar" },
-      "keg": { "output": "Melon Juice", "sellPrice": 375, "processDays": 4, "processor": "keg" }
+      "keg": { "output": "Melon Wine", "sellPrice": 750, "processDays": 7, "processor": "keg" }
     }
   },
   {
@@ -31,7 +31,7 @@
     "category": "vegetable",
     "processing": {
       "preservesJar": { "output": "Tomato Pickle", "sellPrice": 170, "processDays": 2.8, "processor": "preservesJar" },
-      "keg": { "output": "Tomato Juice", "sellPrice": 90, "processDays": 4, "processor": "keg" }
+      "keg": { "output": "Tomato Juice", "sellPrice": 135, "processDays": 4, "processor": "keg" }
     }
   },
   {
@@ -66,7 +66,7 @@
     "category": "fruit",
     "processing": {
       "preservesJar": { "output": "Hot Pepper Jelly", "sellPrice": 130, "processDays": 2.8, "processor": "preservesJar" },
-      "keg": { "output": "Hot Pepper Juice", "sellPrice": 60, "processDays": 4, "processor": "keg" }
+      "keg": { "output": "Hot Pepper Wine", "sellPrice": 120, "processDays": 7, "processor": "keg" }
     }
   },
   {
@@ -83,7 +83,7 @@
     "category": "vegetable",
     "processing": {
       "preservesJar": { "output": "Radish Pickle", "sellPrice": 230, "processDays": 2.8, "processor": "preservesJar" },
-      "keg": { "output": "Radish Juice", "sellPrice": 135, "processDays": 4, "processor": "keg" }
+      "keg": { "output": "Radish Juice", "sellPrice": 202, "processDays": 4, "processor": "keg" }
     }
   },
   {
@@ -101,7 +101,7 @@
     "giantCropChance": 0.01,
     "processing": {
       "preservesJar": { "output": "Red Cabbage Pickle", "sellPrice": 570, "processDays": 2.8, "processor": "preservesJar" },
-      "keg": { "output": "Red Cabbage Juice", "sellPrice": 390, "processDays": 4, "processor": "keg" }
+      "keg": { "output": "Red Cabbage Juice", "sellPrice": 585, "processDays": 4, "processor": "keg" }
     }
   },
   {
@@ -135,7 +135,7 @@
     "category": "vegetable",
     "processing": {
       "preservesJar": { "output": "Corn Pickle", "sellPrice": 150, "processDays": 2.8, "processor": "preservesJar" },
-      "keg": { "output": "Corn Juice", "sellPrice": 75, "processDays": 4, "processor": "keg" },
+      "keg": { "output": "Corn Juice", "sellPrice": 112, "processDays": 4, "processor": "keg" },
       "oilMaker": { "output": "Oil", "sellPrice": 100, "processDays": 1, "processor": "oilMaker" }
     }
   },

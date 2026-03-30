@@ -21,6 +21,9 @@ export interface HarvestEvent {
   harvestDay: number
   readyDay: number          // harvestDay + processDays (= harvestDay if raw)
   yieldAmount: number
+  processedYield: number    // units that went through a machine (= yieldAmount when unlimited)
+  excessYield: number       // units that couldn't be processed (machine cap exceeded)
+  excessRevenue: number     // revenue from excess sold raw (0 when sellExcessRaw=false or unlimited)
   batchRevenue: number
   cumulativeProfit: number
 }
@@ -33,7 +36,7 @@ export interface FullSeasonResult extends BaseResult {
   batchesSpillingOver: number
 }
 
-export type CompoundingAction = 'plant' | 'harvest+processing' | 'sell+replant' | 'final_sell'
+export type CompoundingAction = 'plant' | 'harvest+processing' | 'regrow' | 'sell' | 'sell+replant' | 'final_sell'
 
 export interface CompoundingSnapshot {
   day: number
@@ -41,6 +44,10 @@ export interface CompoundingSnapshot {
   goldOnHand: number
   cumulativeProfit: number
   action: CompoundingAction
+  excessYield?: number      // units sold raw due to machine cap (set on harvest events)
+  excessRevenue?: number    // gold earned from excess raw sales (set on harvest events)
+  batchId?: number          // which batch this event belongs to (harvest/regrow events only)
+  batchTiles?: number       // tiles in this specific batch (harvest/regrow events only)
 }
 
 export interface CompoundingResult extends BaseResult {

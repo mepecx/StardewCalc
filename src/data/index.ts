@@ -1,31 +1,46 @@
-import type { Crop } from '../types'
+import type { Crop, Season } from '../types'
 import springCrops from './crops/spring.json'
 import summerCrops from './crops/summer.json'
 import fallCrops from './crops/fall.json'
 import winterCrops from './crops/winter.json'
 import greenhouseCrops from './crops/greenhouse.json'
 
-// Merge all season data into a single typed array
-export const ALL_CROPS: Crop[] = [
+// All crops from season files, typed
+const ALL_SEASON_CROPS: Crop[] = [
   ...springCrops,
   ...summerCrops,
   ...fallCrops,
   ...winterCrops,
-  ...greenhouseCrops,
 ] as Crop[]
 
-// Cross-season crops (Corn, Wheat, Sunflower, Coffee Bean) appear in multiple
-// season arrays — they are deduplicated here by id for the all-crops list.
+// Greenhouse-exclusive crops (ancient fruit, cactus fruit, etc.)
+const GREENHOUSE_EXCLUSIVE: Crop[] = greenhouseCrops as Crop[]
+
+// Deduplicated list of all non-greenhouse crops (cross-season crops like Corn
+// appear in multiple JSON files — keep only the first occurrence)
 const seen = new Set<string>()
-export const UNIQUE_CROPS: Crop[] = ALL_CROPS.filter(c => {
+export const SEASONAL_CROPS: Crop[] = ALL_SEASON_CROPS.filter(c => {
   if (seen.has(c.id)) return false
   seen.add(c.id)
   return true
 })
 
-export function getCropsForSeason(season: string): Crop[] {
+// All unique crops including greenhouse-exclusive ones
+export const UNIQUE_CROPS: Crop[] = [
+  ...SEASONAL_CROPS,
+  ...GREENHOUSE_EXCLUSIVE,
+]
+
+/**
+ * Returns crops available for a given season.
+ * Greenhouse shows ALL crops (the greenhouse lets you grow any crop year-round)
+ * plus greenhouse-exclusive crops.
+ */
+export function getCropsForSeason(season: Season | string): Crop[] {
   if (season === 'greenhouse') {
-    return UNIQUE_CROPS.filter(c => c.seasons.includes('greenhouse'))
+    // Greenhouse supports every crop plus greenhouse-exclusives
+    // Exclude winter (no regular crops grow in winter even in greenhouse)
+    return UNIQUE_CROPS
   }
-  return UNIQUE_CROPS.filter(c => c.seasons.includes(season as Crop['seasons'][number]))
+  return SEASONAL_CROPS.filter(c => c.seasons.includes(season as Season))
 }

@@ -8,13 +8,14 @@ export const QUALITY_MULTIPLIERS: Record<QualityTier, number> = {
 }
 
 /**
- * Returns the probability distribution of quality tiers at a given farming level.
+ * Returns the probability distribution of quality tiers at a given farming level (0–10).
  * Based on Stardew Valley wiki formula.
  */
 export function getQualityDistribution(farmingLevel: number): Record<QualityTier, number> {
-  const gold = Math.min(0.2 + 0.04 * Math.floor(farmingLevel / 2), 0.75)
-  const silver = Math.min(0.2 + 0.04 * farmingLevel, 0.75) - gold
-  const iridium = farmingLevel >= 10 ? gold / 2 : 0
+  const level = Math.min(Math.max(0, farmingLevel), 10)
+  const gold = Math.min(0.2 + 0.04 * Math.floor(level / 2), 0.75)
+  const silver = Math.min(0.2 + 0.04 * level, 0.75) - gold
+  const iridium = level >= 10 ? gold / 2 : 0
   const normal = Math.max(0, 1 - silver - gold - iridium)
 
   return { normal, silver, gold, iridium }
