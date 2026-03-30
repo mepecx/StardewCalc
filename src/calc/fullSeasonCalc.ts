@@ -1,5 +1,5 @@
 import type { Crop, FullSeasonResult, HarvestEvent, UserSettings } from '../types'
-import { effectiveSellPrice, getProcessDays, effectiveGrowDays } from './professionModifier'
+import { effectiveSellPrice, getProcessDays, effectiveGrowDays, fertilizerCostPerTile } from './professionModifier'
 
 export function fullSeasonCalc(
   crop: Crop,
@@ -45,7 +45,8 @@ export function fullSeasonCalc(
     }
   }
 
-  let cumulativeProfit = -(crop.seedCost * tiles)
+  const fertCost = fertilizerCostPerTile(settings) * tiles
+  let cumulativeProfit = -(crop.seedCost * tiles) - fertCost
   const harvestSchedule: HarvestEvent[] = []
   let batchesCompletedInSeason = 0
   let batchesSpillingOver = 0
@@ -103,7 +104,7 @@ export function fullSeasonCalc(
   const totalHarvests = harvestDays.length
   const totalSeedCost = crop.seedCost * tiles
   const totalRevenue = harvestSchedule.reduce((s, e) => s + e.batchRevenue, 0)
-  const totalProfit = totalRevenue - totalSeedCost
+  const totalProfit = totalRevenue - totalSeedCost - fertCost
   const profitPerDay = availableDays > 0 ? totalProfit / availableDays : 0
   const totalYield = harvestSchedule.reduce((s, e) => s + e.processedYield, 0)
 
