@@ -7,6 +7,7 @@ import { FullSeasonDetail } from './FullSeasonDetail'
 import { CompoundingDetail } from './CompoundingDetail'
 import { ProcessingDetail } from './ProcessingDetail'
 import type { SimpleResult, FullSeasonResult, CompoundingResult, ProcessingResult } from '../../types'
+import { CropIcon } from '../ui/CropIcon'
 
 interface Props {
   onClose: () => void
@@ -37,7 +38,10 @@ export function DetailContent({ onClose }: Props) {
     <>
       {/* Sticky header */}
       <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between z-10">
-        <h2 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{selectedCrop.name}</h2>
+        <h2 className="font-semibold text-gray-900 dark:text-gray-100 text-sm flex items-center gap-1.5">
+          <CropIcon cropId={selectedCrop.id} className="w-5 h-5" />
+          {selectedCrop.name}
+        </h2>
         <button
           onClick={onClose}
           className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-lg leading-none focus:outline-none"

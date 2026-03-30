@@ -1,5 +1,5 @@
 import type { Crop, SimpleResult, UserSettings } from '../types'
-import { effectiveSellPrice, getProcessDays, effectiveGrowDays } from './professionModifier'
+import { effectiveSellPrice, getProcessDays, effectiveGrowDays, fertilizerCostPerTile } from './professionModifier'
 
 export function simpleCalc(crop: Crop, settings: UserSettings): SimpleResult | null {
   const { season, sellMode, startDay, tilesPlanted, unlimitedMachines, machineCount, sellExcessRaw } = settings
@@ -33,7 +33,8 @@ export function simpleCalc(crop: Crop, settings: UserSettings): SimpleResult | n
 
   const revenue = processedYield * unitPrice + excessRevenue
   const totalSeedCost = crop.seedCost * tiles
-  const profit = revenue - totalSeedCost
+  const totalFertCost = fertilizerCostPerTile(settings) * tiles
+  const profit = revenue - totalSeedCost - totalFertCost
   const profitPerDay = effectiveDays > 0 ? profit / effectiveDays : 0
 
   return {

@@ -51,6 +51,18 @@ export function effectiveGrowDays(crop: Crop, settings: UserSettings): number {
 }
 
 /**
+ * Returns the per-tile cost of fertilizer given settings.
+ * Speed-Gro: Pierre 100g
+ * Deluxe Speed-Gro: Pierre 150g, Sandy 80g
+ */
+export function fertilizerCostPerTile(settings: UserSettings): number {
+  if (!settings.payForFertilizer || settings.fertilizer === 'none') return 0
+  if (settings.fertilizer === 'speedGro') return 100 // Pierre only
+  // deluxeSpeedGro
+  return settings.fertilizerSource === 'sandy' ? 80 : 150
+}
+
+/**
  * Returns the output name for the selected sell mode.
  */
 export function getOutputName(crop: Crop, sellMode: SellMode): string {

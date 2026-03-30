@@ -3,6 +3,7 @@ import { useCalcResults } from '../../hooks/useCalcResults'
 import { useSettingsContext } from '../../context/SettingsContext'
 import { getCropsForSeason } from '../../data'
 import { formatGold } from '../ui/GoldIcon'
+import { CropIcon } from '../ui/CropIcon'
 
 const CATEGORY_COLORS: Record<string, string> = {
   vegetable: 'bg-green-400',
@@ -68,11 +69,12 @@ export function ProfitBarChart() {
             >
               {/* Crop name */}
               <span
-                className={`w-28 shrink-0 text-xs truncate ${
+                className={`w-32 shrink-0 text-xs truncate flex items-center gap-1 ${
                   isSelected ? 'font-semibold text-green-800 dark:text-green-400' : 'text-gray-700 dark:text-gray-300'
                 }`}
                 title={crop.name}
               >
+                <CropIcon cropId={crop.id} className="w-4 h-4 shrink-0" />
                 {crop.name}
               </span>
 

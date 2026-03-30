@@ -2,6 +2,8 @@ export type Season = 'spring' | 'summer' | 'fall' | 'winter' | 'greenhouse'
 
 export type Fertilizer = 'none' | 'speedGro' | 'deluxeSpeedGro'
 
+export type FertilizerSource = 'pierre' | 'sandy'
+
 export type CalcMode = 'simple' | 'fullSeason' | 'compounding' | 'processing'
 
 export type QualityTier = 'normal' | 'silver' | 'gold' | 'iridium'
@@ -26,6 +28,8 @@ export interface UserSettings {
   maxSeeds: number             // compounding: cap on seeds; 0 = unlimited
   unlimitedMaxSeeds: boolean   // toggle: ignore maxSeeds cap
   fertilizer: Fertilizer       // speed-gro fertilizer reduces initial grow time
+  payForFertilizer: boolean    // deduct fertilizer cost from profit
+  fertilizerSource: FertilizerSource  // vendor for fertilizer pricing
   machineCount: number         // how many processing machines are available
   unlimitedMachines: boolean   // toggle: ignore machineCount cap
   sellExcessRaw: boolean       // when machines are capped, sell excess crops at raw price instead of discarding
@@ -47,6 +51,8 @@ export const DEFAULT_SETTINGS: UserSettings = {
   maxSeeds: 0,
   unlimitedMaxSeeds: true,
   fertilizer: 'none',
+  payForFertilizer: false,
+  fertilizerSource: 'pierre',
   machineCount: 1,
   unlimitedMachines: true,
   sellExcessRaw: false,

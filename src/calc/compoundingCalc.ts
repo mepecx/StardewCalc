@@ -1,5 +1,5 @@
 import type { Crop, CompoundingResult, CompoundingSnapshot, UserSettings } from '../types'
-import { effectiveSellPrice, getProcessDays, effectiveGrowDays } from './professionModifier'
+import { effectiveSellPrice, getProcessDays, effectiveGrowDays, fertilizerCostPerTile } from './professionModifier'
 
 /** One planted batch with its own harvest schedule */
 interface CropBatch {
@@ -17,7 +17,6 @@ export function compoundingCalc(crop: Crop, settings: UserSettings): Compounding
   const seasonEndDay = season === 'greenhouse' ? settings.greenhouseSeasons * 28 : 28
 
   if (sellMode !== 'raw' && !crop.processing[sellMode]) return null
-  if (startingGold < crop.seedCost) return null
 
   const unitPrice = effectiveSellPrice(crop, settings, sellMode)
   if (unitPrice === 0) return null
@@ -29,14 +28,16 @@ export function compoundingCalc(crop: Crop, settings: UserSettings): Compounding
 
   const effectiveMaxSeeds = unlimitedMaxSeeds ? Infinity : Math.max(1, maxSeeds)
   const machineCapacity = (processDays > 0 && !unlimitedMachines) ? Math.max(1, machineCount) : Infinity
+  const fertCost = fertilizerCostPerTile(settings)
+  const costPerSeed = crop.seedCost + fertCost
 
   const timeline: CompoundingSnapshot[] = []
   let gold = startingGold
-  let totalTiles = Math.min(Math.floor(gold / crop.seedCost), effectiveMaxSeeds)
+  let totalTiles = Math.min(Math.floor(gold / costPerSeed), effectiveMaxSeeds)
   if (totalTiles === 0) return null
 
-  gold -= totalTiles * crop.seedCost
-  let cumulativeProfit = -(totalTiles * crop.seedCost)
+  gold -= totalTiles * costPerSeed
+  let cumulativeProfit = -(totalTiles * costPerSeed)
   let peakSeeds = totalTiles
   let nextBatchId = 0
 
@@ -116,13 +117,13 @@ export function compoundingCalc(crop: Crop, settings: UserSettings): Compounding
     // Reinvest: can we plant a new batch that harvests in time?
     const newBatchFirstHarvestDay = readyDay + firstGrowDays
     const canPlantNewBatch = newBatchFirstHarvestDay <= seasonEndDay
-    const affordableNewSeeds = Math.floor(gold / crop.seedCost)
+    const affordableNewSeeds = Math.floor(gold / costPerSeed)
     const canBuyNewSeeds = affordableNewSeeds > 0 && totalTiles < effectiveMaxSeeds
 
     if (canPlantNewBatch && canBuyNewSeeds) {
       const newSeeds = Math.min(affordableNewSeeds, effectiveMaxSeeds - totalTiles)
-      gold -= newSeeds * crop.seedCost
-      cumulativeProfit -= newSeeds * crop.seedCost
+      gold -= newSeeds * costPerSeed
+      cumulativeProfit -= newSeeds * costPerSeed
       totalTiles += newSeeds
       if (totalTiles > peakSeeds) peakSeeds = totalTiles
 

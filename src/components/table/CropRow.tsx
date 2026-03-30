@@ -1,5 +1,6 @@
 import type { Crop, AnyResult, ProcessingResult, CompoundingResult } from '../../types'
 import { CategoryBadge, SeedSourceBadge } from '../ui/Badge'
+import { CropIcon } from '../ui/CropIcon'
 import { GoldIcon, formatGold } from '../ui/GoldIcon'
 import { Tooltip } from '../ui/Tooltip'
 
@@ -26,6 +27,7 @@ export function CropRow({ crop, result, isSelected, onClick, mode }: Props) {
       {/* Crop name + category */}
       <td className="px-3 py-2.5">
         <div className="flex items-center gap-2">
+          <CropIcon cropId={crop.id} className="w-5 h-5" />
           <CategoryBadge category={crop.category} />
           <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{crop.name}</span>
         </div>
