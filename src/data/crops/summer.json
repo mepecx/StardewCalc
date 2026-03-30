@@ -1,0 +1,218 @@
+[
+  {
+    "id": "melon",
+    "name": "Melon",
+    "seasons": ["summer"],
+    "seedCost": 80,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 12,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 250,
+    "category": "fruit",
+    "giantCropChance": 0.01,
+    "processing": {
+      "preservesJar": { "output": "Melon Jelly", "sellPrice": 550, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Melon Juice", "sellPrice": 375, "processDays": 4, "processor": "keg" }
+    }
+  },
+  {
+    "id": "tomato",
+    "name": "Tomato",
+    "seasons": ["summer"],
+    "seedCost": 50,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 11,
+    "regrowDays": 4,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 60,
+    "category": "vegetable",
+    "processing": {
+      "preservesJar": { "output": "Tomato Pickle", "sellPrice": 170, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Tomato Juice", "sellPrice": 90, "processDays": 4, "processor": "keg" }
+    }
+  },
+  {
+    "id": "blueberry",
+    "name": "Blueberry",
+    "seasons": ["summer"],
+    "seedCost": 80,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 13,
+    "regrowDays": 4,
+    "baseYield": 3,
+    "extraYieldChance": 0,
+    "sellPrice": 50,
+    "category": "fruit",
+    "processing": {
+      "preservesJar": { "output": "Blueberry Jelly", "sellPrice": 150, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Blueberry Wine", "sellPrice": 150, "processDays": 7, "processor": "keg" },
+      "dehydrator": { "output": "Dried Blueberry", "sellPrice": 100, "processDays": 1, "processor": "dehydrator" }
+    }
+  },
+  {
+    "id": "hot-pepper",
+    "name": "Hot Pepper",
+    "seasons": ["summer"],
+    "seedCost": 40,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 5,
+    "regrowDays": 3,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 40,
+    "category": "fruit",
+    "processing": {
+      "preservesJar": { "output": "Hot Pepper Jelly", "sellPrice": 130, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Hot Pepper Juice", "sellPrice": 60, "processDays": 4, "processor": "keg" }
+    }
+  },
+  {
+    "id": "radish",
+    "name": "Radish",
+    "seasons": ["summer"],
+    "seedCost": 40,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 6,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 90,
+    "category": "vegetable",
+    "processing": {
+      "preservesJar": { "output": "Radish Pickle", "sellPrice": 230, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Radish Juice", "sellPrice": 135, "processDays": 4, "processor": "keg" }
+    }
+  },
+  {
+    "id": "red-cabbage",
+    "name": "Red Cabbage",
+    "seasons": ["summer"],
+    "seedCost": 100,
+    "seedSource": ["pierre"],
+    "growDays": 9,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 260,
+    "category": "vegetable",
+    "giantCropChance": 0.01,
+    "processing": {
+      "preservesJar": { "output": "Red Cabbage Pickle", "sellPrice": 570, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Red Cabbage Juice", "sellPrice": 390, "processDays": 4, "processor": "keg" }
+    }
+  },
+  {
+    "id": "starfruit",
+    "name": "Starfruit",
+    "seasons": ["summer"],
+    "seedCost": 400,
+    "seedSource": ["oasis"],
+    "growDays": 13,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 750,
+    "category": "fruit",
+    "processing": {
+      "preservesJar": { "output": "Starfruit Jelly", "sellPrice": 1550, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Starfruit Wine", "sellPrice": 2250, "processDays": 7, "processor": "keg" }
+    }
+  },
+  {
+    "id": "corn",
+    "name": "Corn",
+    "seasons": ["summer", "fall"],
+    "seedCost": 150,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 14,
+    "regrowDays": 4,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 50,
+    "category": "vegetable",
+    "processing": {
+      "preservesJar": { "output": "Corn Pickle", "sellPrice": 150, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Corn Juice", "sellPrice": 75, "processDays": 4, "processor": "keg" },
+      "oilMaker": { "output": "Oil", "sellPrice": 100, "processDays": 1, "processor": "oilMaker" }
+    }
+  },
+  {
+    "id": "hops",
+    "name": "Hops",
+    "seasons": ["summer"],
+    "seedCost": 60,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 11,
+    "regrowDays": 1,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 25,
+    "category": "vegetable",
+    "processing": {
+      "keg": { "output": "Pale Ale", "sellPrice": 300, "processDays": 1.75, "processor": "keg" }
+    }
+  },
+  {
+    "id": "sunflower",
+    "name": "Sunflower",
+    "seasons": ["summer", "fall"],
+    "seedCost": 200,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 8,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 80,
+    "category": "flower",
+    "processing": {
+      "oilMaker": { "output": "Sunflower Oil", "sellPrice": 100, "processDays": 1, "processor": "oilMaker" }
+    }
+  },
+  {
+    "id": "wheat",
+    "name": "Wheat",
+    "seasons": ["summer", "fall"],
+    "seedCost": 10,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 4,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 25,
+    "category": "vegetable",
+    "processing": {
+      "keg": { "output": "Beer", "sellPrice": 200, "processDays": 1.75, "processor": "keg" }
+    }
+  },
+  {
+    "id": "poppy",
+    "name": "Poppy",
+    "seasons": ["summer"],
+    "seedCost": 100,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 7,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 140,
+    "category": "flower",
+    "processing": {}
+  },
+  {
+    "id": "summer-spangle",
+    "name": "Summer Spangle",
+    "seasons": ["summer"],
+    "seedCost": 50,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 8,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 90,
+    "category": "flower",
+    "processing": {}
+  }
+]

@@ -1,0 +1,36 @@
+[
+  {
+    "id": "ancient-fruit",
+    "name": "Ancient Fruit",
+    "seasons": ["greenhouse"],
+    "seedCost": 600,
+    "seedSource": ["travelingMerchant", "seedMaker"],
+    "growDays": 28,
+    "regrowDays": 7,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 550,
+    "category": "fruit",
+    "processing": {
+      "preservesJar": { "output": "Ancient Jelly", "sellPrice": 1150, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Ancient Wine", "sellPrice": 1650, "processDays": 7, "processor": "keg" }
+    }
+  },
+  {
+    "id": "cactus-fruit",
+    "name": "Cactus Fruit",
+    "seasons": ["greenhouse"],
+    "seedCost": 150,
+    "seedSource": ["oasis"],
+    "growDays": 7,
+    "regrowDays": 3,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 75,
+    "category": "fruit",
+    "processing": {
+      "preservesJar": { "output": "Cactus Jelly", "sellPrice": 200, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Cactus Wine", "sellPrice": 225, "processDays": 7, "processor": "keg" }
+    }
+  }
+]

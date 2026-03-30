@@ -1,0 +1,193 @@
+[
+  {
+    "id": "parsnip",
+    "name": "Parsnip",
+    "seasons": ["spring"],
+    "seedCost": 20,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 4,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 35,
+    "category": "vegetable",
+    "processing": {
+      "preservesJar": { "output": "Parsnip Pickle", "sellPrice": 120, "processDays": 2.8, "processor": "preservesJar" }
+    }
+  },
+  {
+    "id": "potato",
+    "name": "Potato",
+    "seasons": ["spring"],
+    "seedCost": 50,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 6,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0.2,
+    "sellPrice": 80,
+    "category": "vegetable",
+    "processing": {
+      "preservesJar": { "output": "Potato Pickle", "sellPrice": 220, "processDays": 2.8, "processor": "preservesJar" }
+    }
+  },
+  {
+    "id": "cauliflower",
+    "name": "Cauliflower",
+    "seasons": ["spring"],
+    "seedCost": 80,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 12,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 175,
+    "category": "vegetable",
+    "giantCropChance": 0.01,
+    "processing": {
+      "preservesJar": { "output": "Cauliflower Pickle", "sellPrice": 400, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Vegetable Juice", "sellPrice": 262, "processDays": 4, "processor": "keg" }
+    }
+  },
+  {
+    "id": "green-bean",
+    "name": "Green Bean",
+    "seasons": ["spring"],
+    "seedCost": 60,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 10,
+    "regrowDays": 3,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 40,
+    "category": "vegetable",
+    "processing": {
+      "preservesJar": { "output": "Green Bean Pickle", "sellPrice": 130, "processDays": 2.8, "processor": "preservesJar" }
+    }
+  },
+  {
+    "id": "kale",
+    "name": "Kale",
+    "seasons": ["spring"],
+    "seedCost": 70,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 6,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 110,
+    "category": "vegetable",
+    "processing": {
+      "preservesJar": { "output": "Kale Pickle", "sellPrice": 270, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Vegetable Juice", "sellPrice": 165, "processDays": 4, "processor": "keg" }
+    }
+  },
+  {
+    "id": "coffee-bean",
+    "name": "Coffee Bean",
+    "seasons": ["spring", "summer"],
+    "seedCost": 2500,
+    "seedSource": ["travelingMerchant"],
+    "growDays": 10,
+    "regrowDays": 2,
+    "baseYield": 4,
+    "extraYieldChance": 0,
+    "sellPrice": 15,
+    "category": "vegetable",
+    "processing": {
+      "keg": { "output": "Coffee", "sellPrice": 150, "processDays": 2, "processor": "keg" }
+    }
+  },
+  {
+    "id": "strawberry",
+    "name": "Strawberry",
+    "seasons": ["spring"],
+    "seedCost": 100,
+    "seedSource": ["eggFestival"],
+    "growDays": 8,
+    "regrowDays": 4,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 120,
+    "category": "fruit",
+    "processing": {
+      "preservesJar": { "output": "Strawberry Jelly", "sellPrice": 290, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Strawberry Wine", "sellPrice": 360, "processDays": 7, "processor": "keg" }
+    }
+  },
+  {
+    "id": "tulip",
+    "name": "Tulip",
+    "seasons": ["spring"],
+    "seedCost": 20,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 6,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 30,
+    "category": "flower",
+    "processing": {}
+  },
+  {
+    "id": "blue-jazz",
+    "name": "Blue Jazz",
+    "seasons": ["spring"],
+    "seedCost": 30,
+    "seedSource": ["pierre", "joja"],
+    "growDays": 7,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 50,
+    "category": "flower",
+    "processing": {}
+  },
+  {
+    "id": "garlic",
+    "name": "Garlic",
+    "seasons": ["spring"],
+    "seedCost": 40,
+    "seedSource": ["pierre"],
+    "growDays": 4,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 60,
+    "category": "vegetable",
+    "processing": {
+      "preservesJar": { "output": "Garlic Pickle", "sellPrice": 170, "processDays": 2.8, "processor": "preservesJar" }
+    }
+  },
+  {
+    "id": "rhubarb",
+    "name": "Rhubarb",
+    "seasons": ["spring"],
+    "seedCost": 100,
+    "seedSource": ["oasis"],
+    "growDays": 13,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 220,
+    "category": "fruit",
+    "processing": {
+      "preservesJar": { "output": "Rhubarb Jelly", "sellPrice": 490, "processDays": 2.8, "processor": "preservesJar" },
+      "keg": { "output": "Rhubarb Wine", "sellPrice": 660, "processDays": 7, "processor": "keg" }
+    }
+  },
+  {
+    "id": "rice",
+    "name": "Unmilled Rice",
+    "seasons": ["spring"],
+    "seedCost": 40,
+    "seedSource": ["pierre"],
+    "growDays": 6,
+    "regrowDays": 0,
+    "baseYield": 1,
+    "extraYieldChance": 0,
+    "sellPrice": 30,
+    "category": "vegetable",
+    "processing": {}
+  }
+]
