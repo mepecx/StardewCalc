@@ -25,3 +25,10 @@ Built with React, TypeScript, Vite, and TailwindCSS.
   - Strawberry: Egg Festival (Spring 13)
   - Rare Seed: Traveling Merchant (Fri/Sun, random stock)
 - [ ] Warn when a selected start day falls on a day the chosen vendor is closed
+
+### UI Changes
+
+- [ ] Make compounding reinvestment colors less similar to each other
+- [ ] Add clickable links to Stardew Wiki crops
+- [ ] Add a Help section
+- [ ] Show total seed cost in table (still show unit cost)
