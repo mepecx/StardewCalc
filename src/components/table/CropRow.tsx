@@ -3,6 +3,7 @@ import { CategoryBadge, SeedSourceBadge } from '../ui/Badge'
 import { CropIcon } from '../ui/CropIcon'
 import { GoldIcon, formatGold } from '../ui/GoldIcon'
 import { Tooltip } from '../ui/Tooltip'
+import { useSettingsContext } from '../../context/SettingsContext'
 
 interface Props {
   crop: Crop
@@ -13,7 +14,10 @@ interface Props {
 }
 
 export function CropRow({ crop, result, isSelected, onClick, mode }: Props) {
+  const { settings } = useSettingsContext()
   const isNA = result === null
+  const tiles = mode === 'compounding' ? 1 : Math.max(1, settings.tilesPlanted)
+  const totalSeedCost = crop.seedCost * tiles
 
   return (
     <tr
@@ -35,10 +39,22 @@ export function CropRow({ crop, result, isSelected, onClick, mode }: Props) {
 
       {/* Seed cost */}
       <td className="px-3 py-2.5 text-right">
-        <span className="inline-flex items-center justify-end gap-1 text-sm text-gray-700 dark:text-gray-300">
-          <GoldIcon className="w-3.5 h-3.5" />
-          {formatGold(crop.seedCost)}
-        </span>
+        {tiles > 1 ? (
+          <div className="text-right">
+            <span className="inline-flex items-center justify-end gap-1 text-sm text-gray-700 dark:text-gray-300">
+              <GoldIcon className="w-3.5 h-3.5" />
+              {formatGold(totalSeedCost)}
+            </span>
+            <div className="text-xs text-gray-400 dark:text-gray-500">
+              {formatGold(crop.seedCost)} x {tiles}
+            </div>
+          </div>
+        ) : (
+          <span className="inline-flex items-center justify-end gap-1 text-sm text-gray-700 dark:text-gray-300">
+            <GoldIcon className="w-3.5 h-3.5" />
+            {formatGold(crop.seedCost)}
+          </span>
+        )}
       </td>
 
       {/* Total profit */}

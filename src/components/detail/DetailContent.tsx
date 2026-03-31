@@ -8,6 +8,7 @@ import { CompoundingDetail } from './CompoundingDetail'
 import { ProcessingDetail } from './ProcessingDetail'
 import type { SimpleResult, FullSeasonResult, CompoundingResult, ProcessingResult } from '../../types'
 import { CropIcon } from '../ui/CropIcon'
+import { CropStats } from './CropStats'
 
 interface Props {
   onClose: () => void
@@ -51,8 +52,9 @@ export function DetailContent({ onClose }: Props) {
         </button>
       </div>
 
-      {/* Mode-specific detail */}
+      {/* Shared crop stats + mode-specific detail */}
       <div className="p-4">
+        <CropStats crop={selectedCrop} />
         {settings.mode === 'simple' && (
           <SimpleDetail crop={selectedCrop} result={result as SimpleResult} />
         )}
