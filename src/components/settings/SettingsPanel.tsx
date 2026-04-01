@@ -250,6 +250,31 @@ export function SettingsPanel() {
     </SettingsGroup>
   )
 
+  const pierreSection = (
+    <section className="space-y-2">
+      <label className={checkboxLabelClass}>
+        <input
+          type="checkbox"
+          checked={settings.pierreOpenWednesday}
+          onChange={e => updateSettings({ pierreOpenWednesday: e.target.checked })}
+          className="accent-green-600 w-4 h-4"
+        />
+        <span className={checkboxTextClass}>Pierre open Wed.</span>
+      </label>
+      <p className="text-xs text-gray-400 mt-1 ml-6">CC complete or town key</p>
+      <label className={checkboxLabelClass}>
+        <input
+          type="checkbox"
+          checked={settings.jojaAvailable}
+          onChange={e => updateSettings({ jojaAvailable: e.target.checked })}
+          className="accent-green-600 w-4 h-4"
+        />
+        <span className={checkboxTextClass}>Joja available</span>
+      </label>
+      <p className="text-xs text-gray-400 mt-1 ml-6">Buy seeds from JojaMart (25% markup)</p>
+    </section>
+  )
+
   const greenhouseSection = isGreenhouse ? (
     <section>
       <label className={labelClass}>
@@ -328,7 +353,7 @@ export function SettingsPanel() {
         <div className="flex flex-col gap-4 p-4 overflow-y-auto">
           {isCompounding ? (
             <>
-              {/* Compounding order: calendar, starting gold, max seeds, sell as, machines, fertilizer, levels, greenhouse */}
+              {/* Compounding order: calendar, starting gold, max seeds, sell as, machines, fertilizer, levels, pierre, greenhouse */}
               {calendarSection}
               {startingGoldSection}
               {maxSeedsSection}
@@ -336,17 +361,19 @@ export function SettingsPanel() {
               {machinesSection}
               {fertilizerSection}
               {levelsSection}
+              {pierreSection}
               {greenhouseSection}
             </>
           ) : (
             <>
-              {/* Default order: calendar, tiles, sell as, machines, fertilizer, levels, greenhouse */}
+              {/* Default order: calendar, tiles, sell as, machines, fertilizer, levels, pierre, greenhouse */}
               {calendarSection}
               {tilesSection}
               {sellAsSection}
               {machinesSection}
               {fertilizerSection}
               {levelsSection}
+              {pierreSection}
               {greenhouseSection}
             </>
           )}

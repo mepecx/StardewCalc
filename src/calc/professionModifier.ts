@@ -63,6 +63,79 @@ export function fertilizerCostPerTile(settings: UserSettings): number {
 }
 
 /**
+ * Returns true if Pierre is the only reliable shop source for this crop's seeds.
+ * (No Joja or Oasis alternative.)
+ */
+export function isPierreOnlyCrop(crop: Crop): boolean {
+  return crop.seedSource.includes('pierre') &&
+    !crop.seedSource.includes('joja') &&
+    !crop.seedSource.includes('oasis')
+}
+
+/**
+ * In Stardew's Mon=1 calendar, Wednesdays are days where day % 7 === 3
+ * (i.e. days 3, 10, 17, 24).
+ */
+export function isWednesday(day: number): boolean {
+  return day % 7 === 3
+}
+
+/**
+ * JojaMart seed price — 25% markup over Pierre's price (floor, matching game behavior).
+ */
+export function jojaSeedPrice(pierreCost: number): number {
+  return Math.floor(pierreCost * 1.25)
+}
+
+export interface PurchaseInfo {
+  day: number
+  seedCost: number
+  isJojaFallback: boolean
+}
+
+/**
+ * Resolves where and when seeds can be purchased on a given day.
+ * Returns the effective purchase day, seed cost, and whether Joja was used.
+ *
+ * Logic:
+ * - If Pierre is open (not Wednesday, or pierreOpenWednesday=true): Pierre price
+ * - If Pierre is closed and crop has Joja + jojaAvailable: Joja price (same day)
+ * - If Pierre is closed and no Joja fallback: delay to Thursday at Pierre price
+ * - If crop doesn't use Pierre at all (oasis, festival, etc.): no adjustment
+ */
+export function resolvePurchase(day: number, crop: Crop, settings: UserSettings): PurchaseInfo {
+  const hasPierre = crop.seedSource.includes('pierre')
+
+  // If Pierre isn't a source for this crop, no adjustment needed
+  if (!hasPierre) {
+    return { day, seedCost: crop.seedCost, isJojaFallback: false }
+  }
+
+  const pierreOpen = settings.pierreOpenWednesday || !isWednesday(day)
+  if (pierreOpen) {
+    return { day, seedCost: crop.seedCost, isJojaFallback: false }
+  }
+
+  // Pierre is closed (Wednesday) — check Joja fallback
+  const hasJoja = crop.seedSource.includes('joja')
+  if (hasJoja && settings.jojaAvailable) {
+    return { day, seedCost: jojaSeedPrice(crop.seedCost), isJojaFallback: true }
+  }
+
+  // No Joja option or Joja disabled — wait for Thursday
+  return { day: day + 1, seedCost: crop.seedCost, isJojaFallback: false }
+}
+
+/**
+ * Returns true if the crop's seeds can only be obtained from festivals,
+ * traveling merchant, or seed maker — i.e., no reliable everyday shop source.
+ */
+export function hasUnreliableSeedSource(crop: Crop): boolean {
+  const reliableSources = ['pierre', 'joja', 'oasis', 'krobus', 'island']
+  return !crop.seedSource.some(s => reliableSources.includes(s))
+}
+
+/**
  * Returns the output name for the selected sell mode.
  */
 export function getOutputName(crop: Crop, sellMode: SellMode): string {

@@ -15,10 +15,9 @@ export function SimpleDetail({ crop, result }: Props) {
 
   return (
     <div className="space-y-4">
-      <h3 className="font-semibold text-gray-900 dark:text-gray-100">Single Harvest Breakdown</h3>
+      <h3 className="font-semibold text-gray-900 dark:text-gray-100">Single Harvest</h3>
 
       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 space-y-2 text-sm">
-        <Row label="Grow Time" value={`${crop.growDays} days`} />
         {result.effectiveDays > crop.growDays && (
           <Row
             label="Processing Time"
@@ -26,7 +25,6 @@ export function SimpleDetail({ crop, result }: Props) {
           />
         )}
         <Row label="Effective Days" value={`${result.effectiveDays.toFixed(1)} days`} />
-        <Row label="Expected Yield" value={`${(crop.baseYield + crop.extraYieldChance).toFixed(2)}`} />
         <div className="border-t border-gray-200 dark:border-gray-600 pt-2 mt-2">
           <Row label="Revenue" value={formatGold(result.revenue)} gold />
           <Row label="Seed Cost" value={`-${formatGold(result.seedCost)}`} negative />

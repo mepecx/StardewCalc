@@ -1,10 +1,13 @@
 import type { Crop, SimpleResult, UserSettings } from '../types'
-import { effectiveSellPrice, getProcessDays, effectiveGrowDays, fertilizerCostPerTile } from './professionModifier'
+import { effectiveSellPrice, getProcessDays, effectiveGrowDays, fertilizerCostPerTile, resolvePurchase } from './professionModifier'
 
 export function simpleCalc(crop: Crop, settings: UserSettings): SimpleResult | null {
   const { season, sellMode, startDay, tilesPlanted, unlimitedMachines, machineCount, sellExcessRaw } = settings
   const seasonDays = season === 'greenhouse' ? settings.greenhouseSeasons * 28 : 28
-  const maxGrowDays = seasonDays - startDay
+  // Account for Pierre's Wednesday closure / Joja fallback pricing
+  const purchase = resolvePurchase(startDay, crop, settings)
+  const plantDay = purchase.day
+  const maxGrowDays = seasonDays - plantDay
   const growDays = effectiveGrowDays(crop, settings)
 
   if (growDays > maxGrowDays) return null
@@ -32,7 +35,7 @@ export function simpleCalc(crop: Crop, settings: UserSettings): SimpleResult | n
   const excessRevenue = sellExcessRaw ? excessYield * rawUnitPrice : 0
 
   const revenue = processedYield * unitPrice + excessRevenue
-  const totalSeedCost = crop.seedCost * tiles
+  const totalSeedCost = purchase.seedCost * tiles
   const totalFertCost = fertilizerCostPerTile(settings) * tiles
   const profit = revenue - totalSeedCost - totalFertCost
   const profitPerDay = effectiveDays > 0 ? profit / effectiveDays : 0

@@ -48,6 +48,7 @@ export interface CompoundingSnapshot {
   excessRevenue?: number    // gold earned from excess raw sales (set on harvest events)
   batchId?: number          // which batch this event belongs to (harvest/regrow events only)
   batchTiles?: number       // tiles in this specific batch (harvest/regrow events only)
+  isJojaFallback?: boolean  // seeds bought from Joja (Pierre closed on Wednesday)
 }
 
 export interface CompoundingResult extends BaseResult {

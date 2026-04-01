@@ -37,4 +37,6 @@ export interface Crop {
   category: CropCategory
   processing: Partial<Record<ProcessorType, ProcessingVariant>>
   giantCropChance?: number    // 0.01 default for eligible crops
+  yearAvailable?: number      // earliest year seeds are purchasable (default 1)
+  seedNotes?: string          // availability notes (e.g. "Egg Festival only")
 }

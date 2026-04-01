@@ -28,7 +28,7 @@ Built with React, TypeScript, Vite, and TailwindCSS.
 
 ### UI Changes
 
-- [ ] Make compounding reinvestment colors less similar to each other
+- [x] Make compounding reinvestment colors less similar to each other
 - [ ] Add clickable links to Stardew Wiki crops
 - [ ] Add a Help section
-- [ ] Show total seed cost in table (still show unit cost)
+- [x] Show total seed cost in table (still show unit cost)

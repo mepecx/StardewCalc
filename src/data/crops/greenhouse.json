@@ -5,6 +5,7 @@
     "seasons": ["greenhouse"],
     "seedCost": 600,
     "seedSource": ["travelingMerchant", "seedMaker"],
+    "seedNotes": "Traveling Merchant (Fri & Sun, random stock) or Seed Maker from Ancient Seed artifact.",
     "growDays": 28,
     "regrowDays": 7,
     "baseYield": 1,

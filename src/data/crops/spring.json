@@ -89,6 +89,7 @@
     "seasons": ["spring", "summer"],
     "seedCost": 2500,
     "seedSource": ["travelingMerchant"],
+    "seedNotes": "Traveling Merchant only (Fri & Sun, random stock).",
     "growDays": 10,
     "regrowDays": 2,
     "baseYield": 4,
@@ -111,6 +112,7 @@
     "extraYieldChance": 0,
     "sellPrice": 120,
     "category": "fruit",
+    "seedNotes": "Egg Festival only (Spring 13). Seeds must be purchased during the festival.",
     "processing": {
       "preservesJar": { "output": "Strawberry Jelly", "sellPrice": 290, "processDays": 2.8, "processor": "preservesJar" },
       "keg": { "output": "Strawberry Wine", "sellPrice": 360, "processDays": 7, "processor": "keg" }
