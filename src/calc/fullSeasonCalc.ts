@@ -1,5 +1,5 @@
 import type { Crop, FullSeasonResult, HarvestEvent, UserSettings } from '../types'
-import { effectiveSellPrice, getProcessDays, effectiveGrowDays, fertilizerCostPerTile } from './professionModifier'
+import { effectiveSellPrice, getProcessDays, effectiveGrowDays, fertilizerCostPerTile, resolvePurchase } from './professionModifier'
 
 export function fullSeasonCalc(
   crop: Crop,
@@ -9,11 +9,14 @@ export function fullSeasonCalc(
   const { season, startDay, tilesPlanted, unlimitedMachines, machineCount, sellExcessRaw } = settings
   const sellMode = overrideSellMode ?? settings.sellMode
   const seasonEndDay = season === 'greenhouse' ? settings.greenhouseSeasons * 28 : 28
-  const availableDays = seasonEndDay - startDay + 1
+  // Account for Pierre's Wednesday closure / Joja fallback pricing
+  const purchase = resolvePurchase(startDay, crop, settings)
+  const plantDay = purchase.day
+  const availableDays = seasonEndDay - plantDay + 1
 
   const growDays = effectiveGrowDays(crop, settings)
 
-  if (startDay + growDays > seasonEndDay) return null
+  if (plantDay + growDays > seasonEndDay) return null
   if (sellMode !== 'raw' && !crop.processing[sellMode]) return null
 
   const unitPrice = effectiveSellPrice(crop, settings, sellMode)
@@ -31,7 +34,7 @@ export function fullSeasonCalc(
 
   // Build harvest schedule
   const harvestDays: number[] = []
-  const firstHarvestDay = startDay + growDays
+  const firstHarvestDay = plantDay + growDays
   if (firstHarvestDay > seasonEndDay) return null
 
   harvestDays.push(firstHarvestDay)
@@ -46,7 +49,7 @@ export function fullSeasonCalc(
   }
 
   const fertCost = fertilizerCostPerTile(settings) * tiles
-  let cumulativeProfit = -(crop.seedCost * tiles) - fertCost
+  let cumulativeProfit = -(purchase.seedCost * tiles) - fertCost
   const harvestSchedule: HarvestEvent[] = []
   let batchesCompletedInSeason = 0
   let batchesSpillingOver = 0
@@ -102,7 +105,7 @@ export function fullSeasonCalc(
   }
 
   const totalHarvests = harvestDays.length
-  const totalSeedCost = crop.seedCost * tiles
+  const totalSeedCost = purchase.seedCost * tiles
   const totalRevenue = harvestSchedule.reduce((s, e) => s + e.batchRevenue, 0)
   const totalProfit = totalRevenue - totalSeedCost - fertCost
   const profitPerDay = availableDays > 0 ? totalProfit / availableDays : 0

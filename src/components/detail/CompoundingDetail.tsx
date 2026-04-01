@@ -198,6 +198,11 @@ function EventRow({ snap }: { snap: CompoundingSnapshot }) {
       {snap.action === 'sell+replant' && snap.seeds > 0 && !snap.excessRevenue && (
         <span className="text-gray-400 ml-auto">{snap.seeds} tiles total</span>
       )}
+      {snap.isJojaFallback && (
+        <span className="text-blue-500 dark:text-blue-400 text-[10px] font-semibold ml-1" title="Seeds purchased from JojaMart (Pierre closed Wed)">
+          Joja
+        </span>
+      )}
     </div>
   )
 }

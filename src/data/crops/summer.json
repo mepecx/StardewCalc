@@ -99,6 +99,7 @@
     "sellPrice": 260,
     "category": "vegetable",
     "giantCropChance": 0.01,
+    "yearAvailable": 2,
     "processing": {
       "preservesJar": { "output": "Red Cabbage Pickle", "sellPrice": 570, "processDays": 2.8, "processor": "preservesJar" },
       "keg": { "output": "Red Cabbage Juice", "sellPrice": 585, "processDays": 4, "processor": "keg" }

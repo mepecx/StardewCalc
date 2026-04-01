@@ -173,6 +173,7 @@
     "seasons": ["fall"],
     "seedCost": 1000,
     "seedSource": ["travelingMerchant", "seedMaker"],
+    "seedNotes": "Rare Seed from Traveling Merchant (Fri & Sun, random stock) or Seed Maker.",
     "growDays": 24,
     "regrowDays": 0,
     "baseYield": 1,

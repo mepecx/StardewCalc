@@ -9,6 +9,7 @@ import { ProcessingDetail } from './ProcessingDetail'
 import type { SimpleResult, FullSeasonResult, CompoundingResult, ProcessingResult } from '../../types'
 import { CropIcon } from '../ui/CropIcon'
 import { CropStats } from './CropStats'
+import { hasUnreliableSeedSource } from '../../calc/professionModifier'
 
 interface Props {
   onClose: () => void
@@ -54,6 +55,12 @@ export function DetailContent({ onClose }: Props) {
 
       {/* Shared crop stats + mode-specific detail */}
       <div className="p-4">
+        {hasUnreliableSeedSource(selectedCrop) && (
+          <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-lg px-3 py-2 mb-3 text-xs text-amber-800 dark:text-amber-300">
+            <span className="font-semibold">⚠ Limited seed availability:</span>{' '}
+            This crop has no everyday shop source. Profit calculations assume seeds are already available.
+          </div>
+        )}
         <CropStats crop={selectedCrop} />
         {settings.mode === 'simple' && (
           <SimpleDetail crop={selectedCrop} result={result as SimpleResult} />

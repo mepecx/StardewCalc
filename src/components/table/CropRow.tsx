@@ -4,6 +4,7 @@ import { CropIcon } from '../ui/CropIcon'
 import { GoldIcon, formatGold } from '../ui/GoldIcon'
 import { Tooltip } from '../ui/Tooltip'
 import { useSettingsContext } from '../../context/SettingsContext'
+import { hasUnreliableSeedSource, resolvePurchase } from '../../calc/professionModifier'
 
 interface Props {
   crop: Crop
@@ -17,7 +18,9 @@ export function CropRow({ crop, result, isSelected, onClick, mode }: Props) {
   const { settings } = useSettingsContext()
   const isNA = result === null
   const tiles = mode === 'compounding' ? 1 : Math.max(1, settings.tilesPlanted)
-  const totalSeedCost = crop.seedCost * tiles
+  const purchase = resolvePurchase(settings.startDay, crop, settings)
+  const unitSeedCost = purchase.seedCost
+  const totalSeedCost = unitSeedCost * tiles
 
   return (
     <tr
@@ -34,6 +37,11 @@ export function CropRow({ crop, result, isSelected, onClick, mode }: Props) {
           <CropIcon cropId={crop.id} className="w-5 h-5" />
           <CategoryBadge category={crop.category} />
           <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{crop.name}</span>
+          {hasUnreliableSeedSource(crop) && (
+            <Tooltip text="Limited seed availability — no everyday shop source">
+              <span className="text-amber-500 text-xs font-bold ml-0.5">!</span>
+            </Tooltip>
+          )}
         </div>
       </td>
 
@@ -44,15 +52,17 @@ export function CropRow({ crop, result, isSelected, onClick, mode }: Props) {
             <span className="inline-flex items-center justify-end gap-1 text-sm text-gray-700 dark:text-gray-300">
               <GoldIcon className="w-3.5 h-3.5" />
               {formatGold(totalSeedCost)}
+              {purchase.isJojaFallback && <span className="text-blue-500 dark:text-blue-400 text-[10px] font-semibold">Joja</span>}
             </span>
             <div className="text-xs text-gray-400 dark:text-gray-500">
-              {formatGold(crop.seedCost)} x {tiles}
+              {formatGold(unitSeedCost)} x {tiles}
             </div>
           </div>
         ) : (
           <span className="inline-flex items-center justify-end gap-1 text-sm text-gray-700 dark:text-gray-300">
             <GoldIcon className="w-3.5 h-3.5" />
-            {formatGold(crop.seedCost)}
+            {formatGold(unitSeedCost)}
+            {purchase.isJojaFallback && <span className="text-blue-500 dark:text-blue-400 text-[10px] font-semibold">Joja</span>}
           </span>
         )}
       </td>

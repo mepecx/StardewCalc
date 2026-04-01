@@ -1,5 +1,5 @@
 import type { Crop, CompoundingResult, CompoundingSnapshot, UserSettings } from '../types'
-import { effectiveSellPrice, getProcessDays, effectiveGrowDays, fertilizerCostPerTile } from './professionModifier'
+import { effectiveSellPrice, getProcessDays, effectiveGrowDays, fertilizerCostPerTile, resolvePurchase } from './professionModifier'
 
 /** One planted batch with its own harvest schedule */
 interface CropBatch {
@@ -29,26 +29,38 @@ export function compoundingCalc(crop: Crop, settings: UserSettings): Compounding
   const effectiveMaxSeeds = unlimitedMaxSeeds ? Infinity : Math.max(1, maxSeeds)
   const machineCapacity = (processDays > 0 && !unlimitedMachines) ? Math.max(1, machineCount) : Infinity
   const fertCost = fertilizerCostPerTile(settings)
-  const costPerSeed = crop.seedCost + fertCost
 
   const timeline: CompoundingSnapshot[] = []
   let gold = startingGold
-  let totalTiles = Math.min(Math.floor(gold / costPerSeed), effectiveMaxSeeds)
+
+  // Resolve initial seed purchase (may shift day or use Joja pricing)
+  const initialPurchase = resolvePurchase(startDay, crop, settings)
+  const plantDay = initialPurchase.day
+  const initialCostPerSeed = initialPurchase.seedCost + fertCost
+
+  let totalTiles = Math.min(Math.floor(gold / initialCostPerSeed), effectiveMaxSeeds)
   if (totalTiles === 0) return null
 
-  gold -= totalTiles * costPerSeed
-  let cumulativeProfit = -(totalTiles * costPerSeed)
+  gold -= totalTiles * initialCostPerSeed
+  let cumulativeProfit = -(totalTiles * initialCostPerSeed)
   let peakSeeds = totalTiles
   let nextBatchId = 0
 
   const batches: CropBatch[] = [{
     id: nextBatchId++,
     tiles: totalTiles,
-    nextHarvestDay: startDay + firstGrowDays,
+    nextHarvestDay: plantDay + firstGrowDays,
     isFirstGrow: true,
   }]
 
-  timeline.push({ day: startDay, seeds: totalTiles, goldOnHand: gold, cumulativeProfit, action: 'plant' })
+  timeline.push({
+    day: plantDay,
+    seeds: totalTiles,
+    goldOnHand: gold,
+    cumulativeProfit,
+    action: 'plant',
+    isJojaFallback: initialPurchase.isJojaFallback || undefined,
+  })
 
   const MAX_ITERATIONS = 500
   let iterations = 0
@@ -114,34 +126,38 @@ export function compoundingCalc(crop: Crop, settings: UserSettings): Compounding
       ? Math.min(...remainingActive.map(b => b.nextHarvestDay))
       : Infinity
 
-    // Reinvest: can we plant a new batch that harvests in time?
-    const newBatchFirstHarvestDay = readyDay + firstGrowDays
+    // Reinvest: resolve purchase day and cost (may use Joja on Wednesday)
+    const reinvestPurchase = resolvePurchase(readyDay, crop, settings)
+    const reinvestDay = reinvestPurchase.day
+    const reinvestCostPerSeed = reinvestPurchase.seedCost + fertCost
+    const newBatchFirstHarvestDay = reinvestDay + firstGrowDays
     const canPlantNewBatch = newBatchFirstHarvestDay <= seasonEndDay
-    const affordableNewSeeds = Math.floor(gold / costPerSeed)
+    const affordableNewSeeds = Math.floor(gold / reinvestCostPerSeed)
     const canBuyNewSeeds = affordableNewSeeds > 0 && totalTiles < effectiveMaxSeeds
 
     if (canPlantNewBatch && canBuyNewSeeds) {
       const newSeeds = Math.min(affordableNewSeeds, effectiveMaxSeeds - totalTiles)
-      gold -= newSeeds * costPerSeed
-      cumulativeProfit -= newSeeds * costPerSeed
+      gold -= newSeeds * reinvestCostPerSeed
+      cumulativeProfit -= newSeeds * reinvestCostPerSeed
       totalTiles += newSeeds
       if (totalTiles > peakSeeds) peakSeeds = totalTiles
 
       batches.push({
         id: nextBatchId++,
         tiles: newSeeds,
-        nextHarvestDay: readyDay + firstGrowDays,
+        nextHarvestDay: reinvestDay + firstGrowDays,
         isFirstGrow: true,
       })
 
       timeline.push({
-        day: readyDay,
+        day: reinvestDay,
         seeds: totalTiles,
         goldOnHand: gold,
         cumulativeProfit,
         action: 'sell+replant',
         excessYield: excessYield > 0 ? excessYield : undefined,
         excessRevenue: excessRevenue > 0 ? excessRevenue : undefined,
+        isJojaFallback: reinvestPurchase.isJojaFallback || undefined,
       })
     } else if (nextEarliestHarvest <= seasonEndDay) {
       // More harvests coming but no new seeds purchased
@@ -168,7 +184,7 @@ export function compoundingCalc(crop: Crop, settings: UserSettings): Compounding
     }
   }
 
-  const availableDays = seasonEndDay - startDay + 1
+  const availableDays = seasonEndDay - plantDay + 1
   const totalProfit = gold - startingGold
   const profitPerDay = availableDays > 0 ? totalProfit / availableDays : 0
 

@@ -34,6 +34,8 @@ export interface UserSettings {
   unlimitedMachines: boolean   // toggle: ignore machineCount cap
   sellExcessRaw: boolean       // when machines are capped, sell excess crops at raw price instead of discarding
   darkMode: boolean
+  pierreOpenWednesday: boolean  // CC complete or town key — Pierre open on Wed
+  jojaAvailable: boolean        // allow buying seeds from JojaMart (higher prices)
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {
@@ -57,4 +59,6 @@ export const DEFAULT_SETTINGS: UserSettings = {
   unlimitedMachines: true,
   sellExcessRaw: false,
   darkMode: false,
+  pierreOpenWednesday: false,
+  jojaAvailable: true,
 }
