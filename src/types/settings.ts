@@ -1,3 +1,5 @@
+export type AppMode = 'crops' | 'animals'
+
 export type Season = 'spring' | 'summer' | 'fall' | 'winter' | 'greenhouse'
 
 export type Fertilizer = 'none' | 'speedGro' | 'deluxeSpeedGro'
@@ -13,6 +15,7 @@ export type QualityTier = 'normal' | 'silver' | 'gold' | 'iridium'
 export type SellMode = 'raw' | 'preservesJar' | 'keg' | 'dehydrator' | 'oilMaker'
 
 export interface UserSettings {
+  appMode: AppMode
   season: Season
   mode: CalcMode
   sellMode: SellMode
@@ -40,6 +43,7 @@ export interface UserSettings {
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {
+  appMode: 'crops',
   season: 'spring',
   mode: 'fullSeason',
   sellMode: 'raw',

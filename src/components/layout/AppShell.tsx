@@ -3,6 +3,8 @@ import { CropTable } from '../table/CropTable'
 import { DetailPanel } from '../detail/DetailPanel'
 import { MobileDrawer } from '../detail/MobileDrawer'
 import { ProfitBarChart } from '../chart/ProfitBarChart'
+import { AnimalPlaceholder } from '../animal/AnimalPlaceholder'
+import { useSettingsContext } from '../../context/SettingsContext'
 import type { CropCategory } from '../../types'
 
 interface AppShellProps {
@@ -14,6 +16,16 @@ interface AppShellProps {
 }
 
 export function AppShell({ view, categoryFilter, setCategoryFilter, basicSourceOnly, setBasicSourceOnly }: AppShellProps) {
+  const { settings } = useSettingsContext()
+
+  if (settings.appMode === 'animals') {
+    return (
+      <div className="flex flex-1 min-h-0 overflow-hidden relative">
+        <AnimalPlaceholder />
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-1 min-h-0 overflow-hidden relative">
       {/* Left sidebar: settings */}
