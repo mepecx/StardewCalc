@@ -338,6 +338,25 @@ export function SettingsPanel() {
     </section>
   )
 
+  const seedMakerSection = (settings.mode === 'fullSeason' || settings.mode === 'compounding') ? (
+    <section>
+      <label className={checkboxLabelClass}>
+        <input
+          type="checkbox"
+          checked={settings.useSeedMaker}
+          onChange={e => updateSettings({ useSeedMaker: e.target.checked })}
+          className="accent-green-600 w-4 h-4"
+        />
+        <span className={checkboxTextClass}>Use Seed Maker</span>
+      </label>
+      <p className="text-xs text-gray-400 mt-1 ml-6">
+        {isCompounding
+          ? 'Divert crops to seed maker instead of buying seeds'
+          : 'Assume seeds from seed maker (no purchase cost)'}
+      </p>
+    </section>
+  ) : null
+
   return (
     <aside className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col shrink-0 w-full sm:w-60">
       <button
@@ -353,9 +372,10 @@ export function SettingsPanel() {
         <div className="flex flex-col gap-4 p-4 overflow-y-auto">
           {isCompounding ? (
             <>
-              {/* Compounding order: calendar, starting gold, max seeds, sell as, machines, fertilizer, levels, pierre, greenhouse */}
+              {/* Compounding order: calendar, starting gold, seed maker, max seeds, sell as, machines, fertilizer, levels, pierre, greenhouse */}
               {calendarSection}
               {startingGoldSection}
+              {seedMakerSection}
               {maxSeedsSection}
               {sellAsSection}
               {machinesSection}
@@ -366,9 +386,10 @@ export function SettingsPanel() {
             </>
           ) : (
             <>
-              {/* Default order: calendar, tiles, sell as, machines, fertilizer, levels, pierre, greenhouse */}
+              {/* Default order: calendar, tiles, seed maker, sell as, machines, fertilizer, levels, pierre, greenhouse */}
               {calendarSection}
               {tilesSection}
+              {seedMakerSection}
               {sellAsSection}
               {machinesSection}
               {fertilizerSection}

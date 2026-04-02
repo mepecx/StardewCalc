@@ -36,6 +36,7 @@ export interface UserSettings {
   darkMode: boolean
   pierreOpenWednesday: boolean  // CC complete or town key — Pierre open on Wed
   jojaAvailable: boolean        // allow buying seeds from JojaMart (higher prices)
+  useSeedMaker: boolean          // divert crops to seed maker instead of buying seeds
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {
@@ -61,4 +62,5 @@ export const DEFAULT_SETTINGS: UserSettings = {
   darkMode: false,
   pierreOpenWednesday: false,
   jojaAvailable: true,
+  useSeedMaker: false,
 }

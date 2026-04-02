@@ -1,5 +1,5 @@
 import type { Crop, FullSeasonResult } from '../../types'
-import { GoldIcon, formatGold } from '../ui/GoldIcon'
+import { GoldIcon, formatGold, formatDay } from '../ui/GoldIcon'
 import { useSettingsContext } from '../../context/SettingsContext'
 
 interface Props {
@@ -14,6 +14,8 @@ export function FullSeasonDetail({ crop: _crop, result }: Props) {
     : 28
 
   const hasExcess = result.harvestSchedule.some(e => e.excessYield > 0)
+  const hasSeedMaker = result.harvestSchedule.some(e => e.cropsDivertedToSeedMaker != null)
+  const hasProcessing = result.harvestSchedule.some(e => e.readyDay !== e.harvestDay)
 
   const breakEvenEvent = result.harvestSchedule.find(e => e.cumulativeProfit >= 0)
   const breakEvenDay = breakEvenEvent?.readyDay ?? null
@@ -26,6 +28,13 @@ export function FullSeasonDetail({ crop: _crop, result }: Props) {
         <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Total Harvests</span><span className="font-medium dark:text-gray-200">{result.totalHarvests}</span></div>
         <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Counted Harvests</span><span className="font-medium dark:text-gray-200">{result.batchesCompletedInSeason}</span></div>
         <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Total Yield</span><span className="font-medium dark:text-gray-200">{result.totalYield.toFixed(1)}</span></div>
+        {result.seedMakerInfo && (
+          <>
+            <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Crops to Seed Maker</span><span className="dark:text-gray-200">{result.seedMakerInfo.cropsDiverted}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Seeds Produced</span><span className="dark:text-gray-200">{result.seedMakerInfo.seedsProduced}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Seed Makers Needed</span><span className="font-medium dark:text-gray-200">{result.seedMakerInfo.recommendedMachines}</span></div>
+          </>
+        )}
         <div className="flex justify-between font-semibold border-t border-gray-200 dark:border-gray-600 pt-2 mt-1">
           <span className="text-gray-500 dark:text-gray-400">Net Profit</span>
           <span className="flex items-center gap-1 dark:text-gray-100"><GoldIcon className="w-3.5 h-3.5" />{formatGold(result.totalProfit)}</span>
@@ -37,7 +46,7 @@ export function FullSeasonDetail({ crop: _crop, result }: Props) {
         <div className="flex justify-between font-semibold">
           <span className="text-gray-500 dark:text-gray-400">Break-even</span>
           {breakEvenDay !== null
-            ? <span className="text-green-700 dark:text-green-400">Day {breakEvenDay}</span>
+            ? <span className="text-green-700 dark:text-green-400">{formatDay(breakEvenDay, settings.season)}</span>
             : <span className="text-red-600 dark:text-red-400">Never</span>
           }
         </div>
@@ -53,9 +62,16 @@ export function FullSeasonDetail({ crop: _crop, result }: Props) {
         <table className="w-full text-xs border-collapse">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-700">
+              <th className="px-2 py-1.5 text-left font-semibold text-gray-600 dark:text-gray-400">Plant</th>
               <th className="px-2 py-1.5 text-left font-semibold text-gray-600 dark:text-gray-400">Harvest</th>
-              <th className="px-2 py-1.5 text-left font-semibold text-gray-600 dark:text-gray-400">Ready</th>
+              {hasProcessing && (
+                <th className="px-2 py-1.5 text-left font-semibold text-gray-600 dark:text-gray-400">Ready</th>
+              )}
               <th className="px-2 py-1.5 text-right font-semibold text-gray-600 dark:text-gray-400">Yield</th>
+              {hasSeedMaker && (
+                <th className="px-2 py-1.5 text-right font-semibold text-gray-600 dark:text-gray-400">SM</th>
+              )}
+              <th className="px-2 py-1.5 text-right font-semibold text-gray-600 dark:text-gray-400">Seeds</th>
               {hasExcess && (
                 <th className="px-2 py-1.5 text-right font-semibold text-gray-600 dark:text-gray-400">Excess</th>
               )}
@@ -68,12 +84,43 @@ export function FullSeasonDetail({ crop: _crop, result }: Props) {
               const spills = evt.readyDay > seasonEndDay
               return (
                 <tr key={i} className={`border-t border-gray-100 dark:border-gray-700 ${spills ? 'bg-amber-50 dark:bg-amber-900/20' : ''}`}>
-                  <td className="px-2 py-1.5 dark:text-gray-300">Day {evt.harvestDay}</td>
                   <td className="px-2 py-1.5 dark:text-gray-300">
-                    Day {evt.readyDay}
-                    {spills && <span className="ml-1 text-amber-600 dark:text-amber-400">*</span>}
+                    {evt.plantDay != null ? (
+                      <>
+                        {formatDay(evt.plantDay, settings.season)}
+                        {evt.isJojaFallback && (
+                          <span className="ml-1 text-blue-500 dark:text-blue-400 text-[10px] font-semibold">Joja</span>
+                        )}
+                        {evt.isSeedMakerReplant && (
+                          <span className="ml-1 text-teal-600 dark:text-teal-400 text-[10px] font-semibold">SM</span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-gray-400">—</span>
+                    )}
                   </td>
+                  <td className="px-2 py-1.5 dark:text-gray-300">{formatDay(evt.harvestDay, settings.season)}</td>
+                  {hasProcessing && (
+                    <td className={`px-2 py-1.5 ${spills ? 'text-amber-600 dark:text-amber-400' : 'dark:text-gray-300'}`}>
+                      {formatDay(evt.readyDay, settings.season)}
+                      {spills && <span className="ml-1 text-[10px] font-semibold">*</span>}
+                    </td>
+                  )}
                   <td className="px-2 py-1.5 text-right dark:text-gray-300">{evt.processedYield.toFixed(1)}</td>
+                  {hasSeedMaker && (
+                    <td className="px-2 py-1.5 text-right">
+                      {evt.cropsDivertedToSeedMaker != null
+                        ? <span className="text-teal-600 dark:text-teal-400">{evt.cropsDivertedToSeedMaker}</span>
+                        : <span className="text-gray-300 dark:text-gray-600">—</span>
+                      }
+                    </td>
+                  )}
+                  <td className="px-2 py-1.5 text-right">
+                    {evt.seedCost > 0
+                      ? <span className="text-red-600 dark:text-red-400">-{formatGold(evt.seedCost)}</span>
+                      : <span className="text-gray-300 dark:text-gray-600">—</span>
+                    }
+                  </td>
                   {hasExcess && (
                     <td className="px-2 py-1.5 text-right">
                       {evt.excessYield > 0
@@ -83,10 +130,7 @@ export function FullSeasonDetail({ crop: _crop, result }: Props) {
                     </td>
                   )}
                   <td className="px-2 py-1.5 text-right dark:text-gray-300">
-                    {spills
-                      ? <span className="text-gray-400 italic">excluded</span>
-                      : formatGold(evt.batchRevenue)
-                    }
+                    {formatGold(evt.batchRevenue)}
                   </td>
                   <td className={`px-2 py-1.5 text-right font-medium ${evt.cumulativeProfit >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                     {formatGold(evt.cumulativeProfit)}
@@ -98,7 +142,7 @@ export function FullSeasonDetail({ crop: _crop, result }: Props) {
         </table>
         {result.batchesSpillingOver > 0 && (
           <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-            * Excluded: processing finishes after day {seasonEndDay}
+            * Processing finishes after the season — sold {settings.season === 'greenhouse' ? 'later' : 'next season'}
           </p>
         )}
         {hasExcess && (

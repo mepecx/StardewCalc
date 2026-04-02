@@ -18,6 +18,7 @@ export interface SimpleResult extends BaseResult {
 }
 
 export interface HarvestEvent {
+  plantDay?: number         // day this cycle's seeds were planted (undefined for regrow after first)
   harvestDay: number
   readyDay: number          // harvestDay + processDays (= harvestDay if raw)
   yieldAmount: number
@@ -26,6 +27,10 @@ export interface HarvestEvent {
   excessRevenue: number     // revenue from excess sold raw (0 when sellExcessRaw=false or unlimited)
   batchRevenue: number
   cumulativeProfit: number
+  seedCost: number          // total gold spent on seeds for this planting (0 for regrow/seed maker)
+  isJojaFallback?: boolean  // seeds bought from Joja
+  cropsDivertedToSeedMaker?: number  // crops sent to seed maker this harvest (reduces sellable yield)
+  isSeedMakerReplant?: boolean       // true if planted via seed maker (no gold cost)
 }
 
 export interface FullSeasonResult extends BaseResult {
@@ -34,6 +39,7 @@ export interface FullSeasonResult extends BaseResult {
   seedsPlanted: number
   batchesCompletedInSeason: number
   batchesSpillingOver: number
+  seedMakerInfo?: SeedMakerInfo
 }
 
 export type CompoundingAction = 'plant' | 'harvest+processing' | 'regrow' | 'sell' | 'sell+replant' | 'final_sell'
@@ -49,6 +55,16 @@ export interface CompoundingSnapshot {
   batchId?: number          // which batch this event belongs to (harvest/regrow events only)
   batchTiles?: number       // tiles in this specific batch (harvest/regrow events only)
   isJojaFallback?: boolean  // seeds bought from Joja (Pierre closed on Wednesday)
+  cropsDivertedToSeedMaker?: number  // crops sent to seed maker this cycle
+  seedsFromSeedMaker?: number        // seeds produced by seed maker this cycle
+  cropsSold?: number                 // crops sold (remaining after seed maker diversion)
+}
+
+export interface SeedMakerInfo {
+  cropsDiverted: number           // total crops sent to seed maker across all cycles
+  seedsProduced: number           // total seeds produced
+  peakCropsDivertedPerDay: number // max crops diverted in a single cycle
+  recommendedMachines: number     // ceil(peak / 60)
 }
 
 export interface CompoundingResult extends BaseResult {
@@ -56,6 +72,7 @@ export interface CompoundingResult extends BaseResult {
   finalGold: number
   peakSeeds: number
   reinvestCycleDays: number
+  seedMakerInfo?: SeedMakerInfo
 }
 
 export interface ProcessingVariantResult {

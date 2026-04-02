@@ -5,6 +5,10 @@ import { getAverageQualityMultiplier } from './qualityModifier'
 export const TILLER_MULTIPLIER = 1.10
 export const ARTISAN_MULTIPLIER = 1.40
 
+// Seed Maker: 97.5% chance of 1-3 seeds (avg 2), 2% mixed, 0.5% ancient
+export const SEED_MAKER_EXPECTED_SEEDS = 1.95   // 0.975 × 2
+export const SEED_MAKER_CROPS_PER_DAY = 40       // ~20 min/crop, conservative estimate accounting for harvest/replant time
+
 /**
  * Returns the effective sell price per unit for a crop in a given sell mode,
  * accounting for professions and optional quality distribution.
