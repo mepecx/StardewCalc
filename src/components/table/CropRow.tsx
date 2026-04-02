@@ -37,6 +37,16 @@ export function CropRow({ crop, result, isSelected, onClick, mode }: Props) {
           <CropIcon cropId={crop.id} className="w-5 h-5" />
           <CategoryBadge category={crop.category} />
           <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{crop.name}</span>
+          <a
+            href={`https://stardewvalleywiki.com/${crop.name.replace(/ /g, '_')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={e => e.stopPropagation()}
+            className="text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+            title="View on Stardew Valley Wiki"
+          >
+            <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M4.5 2A2.5 2.5 0 002 4.5v11A2.5 2.5 0 004.5 18h11a2.5 2.5 0 002.5-2.5v-4a.75.75 0 00-1.5 0v4a1 1 0 01-1 1h-11a1 1 0 01-1-1v-11a1 1 0 011-1h4a.75.75 0 000-1.5h-4zm7 0a.75.75 0 000 1.5h2.69L8.22 9.47a.75.75 0 001.06 1.06l5.97-5.97V7.25a.75.75 0 001.5 0v-4.5a.75.75 0 00-.75-.75h-4.5z" /></svg>
+          </a>
           {hasUnreliableSeedSource(crop) && (
             <Tooltip text="Limited seed availability — no everyday shop source">
               <span className="text-amber-500 text-xs font-bold ml-0.5">!</span>
@@ -70,9 +80,11 @@ export function CropRow({ crop, result, isSelected, onClick, mode }: Props) {
       {/* Total profit */}
       <td className="px-3 py-2.5 text-right">
         {isNA ? (
-          <Tooltip text="This crop cannot be processed with the selected processor">
-            <span className="text-sm text-gray-400">—</span>
-          </Tooltip>
+          mode === 'compounding' && hasUnreliableSeedSource(crop) && !settings.useSeedMaker
+            ? <span className="text-xs text-amber-600 dark:text-amber-400">Seed Maker required</span>
+            : <Tooltip text="This crop cannot be processed with the selected processor">
+                <span className="text-sm text-gray-400">—</span>
+              </Tooltip>
         ) : mode === 'processing' ? (
           <ProcessingBestCell result={result as ProcessingResult} />
         ) : (
@@ -110,6 +122,11 @@ export function CropRow({ crop, result, isSelected, onClick, mode }: Props) {
           {crop.seedSource.map(src => (
             <SeedSourceBadge key={src} source={src} />
           ))}
+          {(crop.yearAvailable ?? 1) >= 2 && (
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400">
+              Year {crop.yearAvailable}
+            </span>
+          )}
         </div>
       </td>
     </tr>

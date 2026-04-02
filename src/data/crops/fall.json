@@ -108,6 +108,7 @@
     "seasons": ["fall"],
     "seedCost": 30,
     "seedSource": ["pierre"],
+    "yearAvailable": 2,
     "growDays": 8,
     "regrowDays": 0,
     "baseYield": 1,

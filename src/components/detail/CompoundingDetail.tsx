@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import type { Crop, CompoundingResult, CompoundingSnapshot, CompoundingAction } from '../../types'
-import { GoldIcon, formatGold } from '../ui/GoldIcon'
+import { GoldIcon, formatGold, formatDay } from '../ui/GoldIcon'
+import { useSettingsContext } from '../../context/SettingsContext'
 
 interface Props {
   crop: Crop
@@ -61,6 +62,8 @@ function groupByDay(timeline: CompoundingSnapshot[]): DayGroup[] {
 }
 
 export function CompoundingDetail({ crop: _crop, result }: Props) {
+  const { settings } = useSettingsContext()
+  const seasonEndDay = settings.season === 'greenhouse' ? settings.greenhouseSeasons * 28 : 28
   const dayGroups = useMemo(() => groupByDay(result.timeline), [result.timeline])
   const hasBatches = result.timeline.some(s => s.batchId !== undefined && s.batchId > 0)
 
@@ -81,6 +84,13 @@ export function CompoundingDetail({ crop: _crop, result }: Props) {
       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 space-y-2 text-sm">
         <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Reinvest Cycle</span><span className="dark:text-gray-200">{result.reinvestCycleDays} days</span></div>
         <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Peak Seeds</span><span className="font-medium dark:text-gray-200">{result.peakSeeds}</span></div>
+        {result.seedMakerInfo && (
+          <>
+            <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Crops to Seed Maker</span><span className="dark:text-gray-200">{result.seedMakerInfo.cropsDiverted}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Seeds Produced</span><span className="dark:text-gray-200">{result.seedMakerInfo.seedsProduced}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Seed Makers Needed</span><span className="font-medium dark:text-gray-200">{result.seedMakerInfo.recommendedMachines}</span></div>
+          </>
+        )}
         <div className="flex justify-between font-semibold border-t border-gray-200 dark:border-gray-600 pt-2 mt-1">
           <span className="text-gray-500 dark:text-gray-400">Final Gold</span>
           <span className="flex items-center gap-1 dark:text-gray-100"><GoldIcon className="w-3.5 h-3.5" />{formatGold(result.finalGold)}</span>
@@ -124,7 +134,7 @@ export function CompoundingDetail({ crop: _crop, result }: Props) {
 
         <div className="space-y-1">
           {dayGroups.map((group, gi) => (
-            <DayGroupCard key={gi} group={group} isLast={gi === dayGroups.length - 1} />
+            <DayGroupCard key={gi} group={group} isLast={gi === dayGroups.length - 1} seasonEndDay={seasonEndDay} season={settings.season} />
           ))}
         </div>
       </div>
@@ -132,20 +142,24 @@ export function CompoundingDetail({ crop: _crop, result }: Props) {
   )
 }
 
-function DayGroupCard({ group, isLast }: { group: DayGroup; isLast: boolean }) {
+function DayGroupCard({ group, isLast, seasonEndDay, season }: { group: DayGroup; isLast: boolean; seasonEndDay: number; season: string }) {
   const lastEvent = group.events[group.events.length - 1]
+  const isAfterSeason = group.day > seasonEndDay
 
   return (
     <div className="relative pl-8">
       {/* Day dot on the timeline */}
       <div className={`absolute left-1.5 top-2.5 w-3 h-3 rounded-full border-2 border-white dark:border-gray-900 z-10 ${
-        isLast ? 'bg-purple-500' : 'bg-blue-500'
+        isAfterSeason ? 'bg-amber-500' : isLast ? 'bg-purple-500' : 'bg-blue-500'
       }`} />
 
       <div className="pb-2">
         {/* Day header */}
         <div className="flex items-baseline gap-2 mb-1">
-          <span className="text-xs font-bold text-gray-900 dark:text-gray-100">Day {group.day}</span>
+          <span className="text-xs font-bold text-gray-900 dark:text-gray-100">{formatDay(group.day, season)}</span>
+          {isAfterSeason && (
+            <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">after season</span>
+          )}
           <span className="text-xs text-gray-400">
             {formatGold(lastEvent.goldOnHand)} on hand
           </span>
@@ -182,7 +196,11 @@ function EventRow({ snap }: { snap: CompoundingSnapshot }) {
     }`}>
       <span className="shrink-0">{ACTION_ICONS[snap.action]}</span>
       <span className={`font-medium ${batchColor && isHarvest ? batchColor.text : 'text-gray-700 dark:text-gray-300'}`}>
-        {ACTION_LABELS[snap.action]}
+        {snap.action === 'sell+replant' && snap.cropsDivertedToSeedMaker
+          ? (snap.cropsSold != null && snap.cropsSold > 0
+            ? `Sell ${snap.cropsSold} + SM ${snap.cropsDivertedToSeedMaker} → ${snap.seedsFromSeedMaker} seeds`
+            : `SM ${snap.cropsDivertedToSeedMaker} → ${snap.seedsFromSeedMaker} seeds`)
+          : ACTION_LABELS[snap.action]}
       </span>
       {isHarvest && snap.batchTiles !== undefined && (
         <span className="text-gray-400 ml-auto">{snap.batchTiles} tiles</span>

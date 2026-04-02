@@ -16,6 +16,8 @@ export function CropStats({ crop }: Props) {
   const yieldPerHarvest = crop.baseYield + crop.extraYieldChance
   const fertCost = fertilizerCostPerTile(settings)
   const yearAvail = crop.yearAvailable ?? 1
+  const isSeedMakerActive = settings.useSeedMaker &&
+    (settings.mode === 'fullSeason' || settings.mode === 'compounding')
   const purchase = resolvePurchase(settings.startDay, crop, settings)
 
   return (
@@ -32,6 +34,9 @@ export function CropStats({ crop }: Props) {
         gold
         warn={purchase.isJojaFallback}
       />
+      {isSeedMakerActive && (
+        <Row label="Replanting" value="Seed Maker" teal />
+      )}
       {fertCost > 0 && (
         <Row label="Fertilizer" value={`${formatGold(fertCost)}/tile`} gold />
       )}
@@ -49,12 +54,13 @@ export function CropStats({ crop }: Props) {
   )
 }
 
-function Row({ label, value, gold, warn }: { label: string; value: string; gold?: boolean; warn?: boolean }) {
+function Row({ label, value, gold, warn, teal }: { label: string; value: string; gold?: boolean; warn?: boolean; teal?: boolean }) {
   return (
     <div className="flex justify-between">
       <span className="text-gray-500 dark:text-gray-400">{label}</span>
       <span className={`flex items-center gap-1 ${
-        warn ? 'text-amber-700 dark:text-amber-400 font-medium'
+        teal ? 'text-teal-600 dark:text-teal-400 font-medium'
+        : warn ? 'text-amber-700 dark:text-amber-400 font-medium'
         : gold ? 'text-gray-900 dark:text-gray-100'
         : 'text-gray-700 dark:text-gray-300'
       }`}>

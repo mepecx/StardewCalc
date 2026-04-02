@@ -1,5 +1,9 @@
 import type { Crop, CompoundingResult, CompoundingSnapshot, UserSettings } from '../types'
-import { effectiveSellPrice, getProcessDays, effectiveGrowDays, fertilizerCostPerTile, resolvePurchase } from './professionModifier'
+import {
+  effectiveSellPrice, getProcessDays, effectiveGrowDays, fertilizerCostPerTile,
+  resolvePurchase, hasUnreliableSeedSource,
+  SEED_MAKER_EXPECTED_SEEDS, SEED_MAKER_CROPS_PER_DAY,
+} from './professionModifier'
 
 /** One planted batch with its own harvest schedule */
 interface CropBatch {
@@ -12,7 +16,7 @@ interface CropBatch {
 export function compoundingCalc(crop: Crop, settings: UserSettings): CompoundingResult | null {
   const {
     season, startingGold, sellMode, startDay, maxSeeds, unlimitedMaxSeeds,
-    unlimitedMachines, machineCount, sellExcessRaw,
+    unlimitedMachines, machineCount, sellExcessRaw, useSeedMaker,
   } = settings
   const seasonEndDay = season === 'greenhouse' ? settings.greenhouseSeasons * 28 : 28
 
@@ -20,6 +24,9 @@ export function compoundingCalc(crop: Crop, settings: UserSettings): Compounding
 
   const unitPrice = effectiveSellPrice(crop, settings, sellMode)
   if (unitPrice === 0) return null
+
+  // Festival-only crops can only compound via seed maker
+  if (hasUnreliableSeedSource(crop) && !useSeedMaker) return null
 
   const rawUnitPrice = sellMode !== 'raw' ? effectiveSellPrice(crop, settings, 'raw') : 0
   const processDays = getProcessDays(crop, sellMode)
@@ -45,6 +52,12 @@ export function compoundingCalc(crop: Crop, settings: UserSettings): Compounding
   let cumulativeProfit = -(totalTiles * initialCostPerSeed)
   let peakSeeds = totalTiles
   let nextBatchId = 0
+
+  // Seed maker tracking
+  let smTotalCropsDiverted = 0
+  let smTotalSeedsProduced = 0
+  let smPeakDivertedPerDay = 0
+  let usedSeedMaker = false
 
   const batches: CropBatch[] = [{
     id: nextBatchId++,
@@ -103,22 +116,23 @@ export function compoundingCalc(crop: Crop, settings: UserSettings): Compounding
       }
     }
 
-    // Processing spills over — no revenue, done
-    if (readyDay > seasonEndDay) break
+    // Processing spills past season — still sell after season ends (no reinvesting)
+    // No time pressure: all crops get processed (machine cap irrelevant)
+    if (readyDay > seasonEndDay) {
+      const processedRevenue = dayTotalYield * unitPrice
 
-    // Apply machine cap to combined day yield
-    const processedYield = Math.min(dayTotalYield, machineCapacity)
-    const excessYield = dayTotalYield - processedYield
-    const excessRevenue = sellExcessRaw ? excessYield * rawUnitPrice : 0
+      gold += processedRevenue
+      cumulativeProfit += processedRevenue
 
-    if (excessRevenue > 0) {
-      gold += excessRevenue
-      cumulativeProfit += excessRevenue
+      timeline.push({
+        day: readyDay,
+        seeds: totalTiles,
+        goldOnHand: gold,
+        cumulativeProfit,
+        action: 'final_sell',
+      })
+      break
     }
-
-    const processedRevenue = processedYield * unitPrice
-    gold += processedRevenue
-    cumulativeProfit += processedRevenue
 
     // Check if any batch can still produce
     const remainingActive = batches.filter(b => b.nextHarvestDay <= seasonEndDay)
@@ -126,61 +140,187 @@ export function compoundingCalc(crop: Crop, settings: UserSettings): Compounding
       ? Math.min(...remainingActive.map(b => b.nextHarvestDay))
       : Infinity
 
-    // Reinvest: resolve purchase day and cost (may use Joja on Wednesday)
-    const reinvestPurchase = resolvePurchase(readyDay, crop, settings)
-    const reinvestDay = reinvestPurchase.day
-    const reinvestCostPerSeed = reinvestPurchase.seedCost + fertCost
-    const newBatchFirstHarvestDay = reinvestDay + firstGrowDays
-    const canPlantNewBatch = newBatchFirstHarvestDay <= seasonEndDay
-    const affordableNewSeeds = Math.floor(gold / reinvestCostPerSeed)
-    const canBuyNewSeeds = affordableNewSeeds > 0 && totalTiles < effectiveMaxSeeds
+    // ──────────── SEED MAKER PATH ────────────
+    if (useSeedMaker) {
+      // Determine how many new seeds we want from seed maker
+      const maxNewSeeds = effectiveMaxSeeds - totalTiles
+      const newBatchFirstHarvestDay = readyDay + firstGrowDays
+      const canPlantNewBatch = newBatchFirstHarvestDay <= seasonEndDay && maxNewSeeds > 0
 
-    if (canPlantNewBatch && canBuyNewSeeds) {
-      const newSeeds = Math.min(affordableNewSeeds, effectiveMaxSeeds - totalTiles)
-      gold -= newSeeds * reinvestCostPerSeed
-      cumulativeProfit -= newSeeds * reinvestCostPerSeed
-      totalTiles += newSeeds
-      if (totalTiles > peakSeeds) peakSeeds = totalTiles
+      if (canPlantNewBatch) {
+        // Calculate seed maker diversion
+        const maxSeedsFromYield = Math.floor(dayTotalYield * SEED_MAKER_EXPECTED_SEEDS)
+        let desiredSeeds = Math.min(maxNewSeeds, maxSeedsFromYield)
 
-      batches.push({
-        id: nextBatchId++,
-        tiles: newSeeds,
-        nextHarvestDay: reinvestDay + firstGrowDays,
-        isFirstGrow: true,
-      })
+        let cropsToSeedMaker = Math.ceil(desiredSeeds / SEED_MAKER_EXPECTED_SEEDS)
+        cropsToSeedMaker = Math.min(cropsToSeedMaker, dayTotalYield)
+        let actualSeeds = Math.min(Math.floor(cropsToSeedMaker * SEED_MAKER_EXPECTED_SEEDS), desiredSeeds)
 
-      timeline.push({
-        day: reinvestDay,
-        seeds: totalTiles,
-        goldOnHand: gold,
-        cumulativeProfit,
-        action: 'sell+replant',
-        excessYield: excessYield > 0 ? excessYield : undefined,
-        excessRevenue: excessRevenue > 0 ? excessRevenue : undefined,
-        isJojaFallback: reinvestPurchase.isJojaFallback || undefined,
-      })
-    } else if (nextEarliestHarvest <= seasonEndDay) {
-      // More harvests coming but no new seeds purchased
-      timeline.push({
-        day: readyDay,
-        seeds: totalTiles,
-        goldOnHand: gold,
-        cumulativeProfit,
-        action: 'sell',
-        excessYield: excessYield > 0 ? excessYield : undefined,
-        excessRevenue: excessRevenue > 0 ? excessRevenue : undefined,
-      })
-    } else {
-      timeline.push({
-        day: readyDay,
-        seeds: totalTiles,
-        goldOnHand: gold,
-        cumulativeProfit,
-        action: 'final_sell',
-        excessYield: excessYield > 0 ? excessYield : undefined,
-        excessRevenue: excessRevenue > 0 ? excessRevenue : undefined,
-      })
-      break
+        // Revenue from remaining crops (after diversion)
+        const remainingForSale = dayTotalYield - cropsToSeedMaker
+        const processedYield = Math.min(remainingForSale, machineCapacity)
+        const excessYield = remainingForSale - processedYield
+        const excessRevenue = sellExcessRaw ? excessYield * rawUnitPrice : 0
+        const processedRevenue = processedYield * unitPrice
+
+        gold += processedRevenue + excessRevenue
+        cumulativeProfit += processedRevenue + excessRevenue
+
+        // Fertilizer cost for new tiles (only gold cost in seed maker mode)
+        if (fertCost > 0 && actualSeeds > 0) {
+          const affordableByFert = Math.floor(gold / fertCost)
+          actualSeeds = Math.min(actualSeeds, affordableByFert)
+          // Recalculate diversion if capped by fertilizer
+          cropsToSeedMaker = Math.ceil(actualSeeds / SEED_MAKER_EXPECTED_SEEDS)
+        }
+
+        if (actualSeeds > 0) {
+          const fertTotal = fertCost * actualSeeds
+          gold -= fertTotal
+          cumulativeProfit -= fertTotal
+          totalTiles += actualSeeds
+          if (totalTiles > peakSeeds) peakSeeds = totalTiles
+
+          // Track seed maker stats
+          usedSeedMaker = true
+          smTotalCropsDiverted += cropsToSeedMaker
+          smTotalSeedsProduced += actualSeeds
+          smPeakDivertedPerDay = Math.max(smPeakDivertedPerDay, cropsToSeedMaker)
+
+          batches.push({
+            id: nextBatchId++,
+            tiles: actualSeeds,
+            nextHarvestDay: readyDay + firstGrowDays,
+            isFirstGrow: true,
+          })
+
+          timeline.push({
+            day: readyDay,
+            seeds: totalTiles,
+            goldOnHand: gold,
+            cumulativeProfit,
+            action: 'sell+replant',
+            excessYield: excessYield > 0 ? excessYield : undefined,
+            excessRevenue: excessRevenue > 0 ? excessRevenue : undefined,
+            cropsDivertedToSeedMaker: cropsToSeedMaker,
+            seedsFromSeedMaker: actualSeeds,
+            cropsSold: remainingForSale,
+          })
+        } else {
+          // Can't plant (no fert gold) — sell everything
+          // Recalculate revenue with full yield since we're not diverting
+          const fullProcessedYield = Math.min(dayTotalYield, machineCapacity)
+          const fullExcessYield = dayTotalYield - fullProcessedYield
+          const fullExcessRevenue = sellExcessRaw ? fullExcessYield * rawUnitPrice : 0
+          const fullProcessedRevenue = fullProcessedYield * unitPrice
+          // Undo partial revenue, apply full revenue
+          gold += (fullProcessedRevenue + fullExcessRevenue) - (processedRevenue + excessRevenue)
+          cumulativeProfit += (fullProcessedRevenue + fullExcessRevenue) - (processedRevenue + excessRevenue)
+
+          if (nextEarliestHarvest <= seasonEndDay) {
+            timeline.push({ day: readyDay, seeds: totalTiles, goldOnHand: gold, cumulativeProfit, action: 'sell',
+              excessYield: fullExcessYield > 0 ? fullExcessYield : undefined,
+              excessRevenue: fullExcessRevenue > 0 ? fullExcessRevenue : undefined })
+          } else {
+            timeline.push({ day: readyDay, seeds: totalTiles, goldOnHand: gold, cumulativeProfit, action: 'final_sell',
+              excessYield: fullExcessYield > 0 ? fullExcessYield : undefined,
+              excessRevenue: fullExcessRevenue > 0 ? fullExcessRevenue : undefined })
+            break
+          }
+        }
+      } else {
+        // Can't plant new batch (season too short or maxSeeds hit) — sell full yield
+        const processedYield = Math.min(dayTotalYield, machineCapacity)
+        const excessYield = dayTotalYield - processedYield
+        const excessRevenue = sellExcessRaw ? excessYield * rawUnitPrice : 0
+        const processedRevenue = processedYield * unitPrice
+
+        gold += processedRevenue + excessRevenue
+        cumulativeProfit += processedRevenue + excessRevenue
+
+        if (nextEarliestHarvest <= seasonEndDay) {
+          timeline.push({ day: readyDay, seeds: totalTiles, goldOnHand: gold, cumulativeProfit, action: 'sell',
+            excessYield: excessYield > 0 ? excessYield : undefined,
+            excessRevenue: excessRevenue > 0 ? excessRevenue : undefined })
+        } else {
+          timeline.push({ day: readyDay, seeds: totalTiles, goldOnHand: gold, cumulativeProfit, action: 'final_sell',
+            excessYield: excessYield > 0 ? excessYield : undefined,
+            excessRevenue: excessRevenue > 0 ? excessRevenue : undefined })
+          break
+        }
+      }
+    }
+    // ──────────── SHOP PURCHASE PATH (original) ────────────
+    else {
+      // Apply machine cap to combined day yield
+      const processedYield = Math.min(dayTotalYield, machineCapacity)
+      const excessYield = dayTotalYield - processedYield
+      const excessRevenue = sellExcessRaw ? excessYield * rawUnitPrice : 0
+
+      if (excessRevenue > 0) {
+        gold += excessRevenue
+        cumulativeProfit += excessRevenue
+      }
+
+      const processedRevenue = processedYield * unitPrice
+      gold += processedRevenue
+      cumulativeProfit += processedRevenue
+
+      // Reinvest: resolve purchase day and cost (may use Joja on Wednesday)
+      const reinvestPurchase = resolvePurchase(readyDay, crop, settings)
+      const reinvestDay = reinvestPurchase.day
+      const reinvestCostPerSeed = reinvestPurchase.seedCost + fertCost
+      const newBatchFirstHarvestDay = reinvestDay + firstGrowDays
+      const canPlantNewBatch = newBatchFirstHarvestDay <= seasonEndDay
+      const affordableNewSeeds = Math.floor(gold / reinvestCostPerSeed)
+      const canBuyNewSeeds = affordableNewSeeds > 0 && totalTiles < effectiveMaxSeeds
+
+      if (canPlantNewBatch && canBuyNewSeeds) {
+        const newSeeds = Math.min(affordableNewSeeds, effectiveMaxSeeds - totalTiles)
+        gold -= newSeeds * reinvestCostPerSeed
+        cumulativeProfit -= newSeeds * reinvestCostPerSeed
+        totalTiles += newSeeds
+        if (totalTiles > peakSeeds) peakSeeds = totalTiles
+
+        batches.push({
+          id: nextBatchId++,
+          tiles: newSeeds,
+          nextHarvestDay: reinvestDay + firstGrowDays,
+          isFirstGrow: true,
+        })
+
+        timeline.push({
+          day: reinvestDay,
+          seeds: totalTiles,
+          goldOnHand: gold,
+          cumulativeProfit,
+          action: 'sell+replant',
+          excessYield: excessYield > 0 ? excessYield : undefined,
+          excessRevenue: excessRevenue > 0 ? excessRevenue : undefined,
+          isJojaFallback: reinvestPurchase.isJojaFallback || undefined,
+        })
+      } else if (nextEarliestHarvest <= seasonEndDay) {
+        timeline.push({
+          day: readyDay,
+          seeds: totalTiles,
+          goldOnHand: gold,
+          cumulativeProfit,
+          action: 'sell',
+          excessYield: excessYield > 0 ? excessYield : undefined,
+          excessRevenue: excessRevenue > 0 ? excessRevenue : undefined,
+        })
+      } else {
+        timeline.push({
+          day: readyDay,
+          seeds: totalTiles,
+          goldOnHand: gold,
+          cumulativeProfit,
+          action: 'final_sell',
+          excessYield: excessYield > 0 ? excessYield : undefined,
+          excessRevenue: excessRevenue > 0 ? excessRevenue : undefined,
+        })
+        break
+      }
     }
   }
 
@@ -209,5 +349,11 @@ export function compoundingCalc(crop: Crop, settings: UserSettings): Compounding
     finalGold: gold,
     peakSeeds,
     reinvestCycleDays,
+    seedMakerInfo: usedSeedMaker ? {
+      cropsDiverted: smTotalCropsDiverted,
+      seedsProduced: smTotalSeedsProduced,
+      peakCropsDivertedPerDay: smPeakDivertedPerDay,
+      recommendedMachines: Math.ceil(smPeakDivertedPerDay / SEED_MAKER_CROPS_PER_DAY),
+    } : undefined,
   }
 }

@@ -152,6 +152,7 @@
     "seasons": ["spring"],
     "seedCost": 40,
     "seedSource": ["pierre"],
+    "yearAvailable": 2,
     "growDays": 4,
     "regrowDays": 0,
     "baseYield": 1,
